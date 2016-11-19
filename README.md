@@ -8,5 +8,7 @@ Current features:
 
 Planned features:
 - Fixing the percent shown (request a pull if you could help with it)
+- Make the command show all kind of votes
+- Add permissions for each vote
 
 Any suggestions?

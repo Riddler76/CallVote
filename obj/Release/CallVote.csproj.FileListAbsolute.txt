@@ -1,0 +1,4 @@
+C:\Users\aglim\Desktop\Plugins\CallVote\CallVote\bin\Release\CallVote.dll
+C:\Users\aglim\Desktop\Plugins\CallVote\CallVote\bin\Release\CallVote.pdb
+C:\Users\aglim\Desktop\Plugins\CallVote\CallVote\obj\Release\CallVote.dll
+C:\Users\aglim\Desktop\Plugins\CallVote\CallVote\obj\Release\CallVote.pdb

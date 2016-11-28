@@ -23,7 +23,7 @@ namespace Arechi.CallVote
 
         public string Help
         {
-            get { return "Start a vote to make it day, night, start/stop rain or summon an airdrop"; }
+            get { return "Start a vote to make it day, night, start/stop rain or summon an airdrop or simply vote for an ongoing vote"; }
         }
 
         public string Name
@@ -41,14 +41,19 @@ namespace Arechi.CallVote
 
         public string Syntax
         {
-            get { return "day|night|storm|airdrop|yes"; }
+            get { return "day|night|rain|airdrop|yes or d|n|r|a|y"; }
         }
 
         public void Execute(IRocketPlayer caller, string[] command)
         {
             UnturnedPlayer player = (UnturnedPlayer)caller;
 
-            if (command[0].ToString().ToLower() == "day" || command[0].ToString().ToLower() == "night" && CallVote.Instance.Configuration.Instance.DayNightVote && CallVote.Instance.VoteInProgress == false && CallVote.Instance.VoteInCooldown == false)
+            if (command.Length == 0)
+            {
+                UnturnedChat.Say(CallVote.Instance.Translate("vote_help"), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
+            }
+
+            if (command[0].ToString().ToLower() == "day" || command[0].ToString().ToLower() == "night" || command[0].ToString().ToLower() == "d" || command[0].ToString().ToLower() == "n" && CallVote.Instance.Configuration.Instance.DayNightVote && CallVote.Instance.VoteInProgress == false && CallVote.Instance.VoteInCooldown == false)
             {
                 UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, command[0], CallVote.Instance.Configuration.Instance.VoteTimer), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
 
@@ -57,7 +62,7 @@ namespace Arechi.CallVote
                 return;
             }
 
-            if (command[0].ToString().ToLower() ==  "rain" && CallVote.Instance.Configuration.Instance.RainVote && CallVote.Instance.VoteInProgress == false && CallVote.Instance.VoteInCooldown == false)
+            if (command[0].ToString().ToLower() ==  "rain" || command[0].ToString().ToLower() == "r" && CallVote.Instance.Configuration.Instance.RainVote && CallVote.Instance.VoteInProgress == false && CallVote.Instance.VoteInCooldown == false)
             {
                 UnturnedChat.Say(CallVote.Instance.Translate("vote_started_storm", player.DisplayName, CallVote.Instance.Configuration.Instance.VoteTimer), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
 
@@ -66,7 +71,7 @@ namespace Arechi.CallVote
                 return;
             }
 
-            if (command[0].ToString().ToLower() == "airdrop" && CallVote.Instance.Configuration.Instance.AirdropVote && CallVote.Instance.VoteInProgress == false && CallVote.Instance.VoteInCooldown == false)
+            if (command[0].ToString().ToLower() == "airdrop" || command[0].ToString().ToLower() == "a" && CallVote.Instance.Configuration.Instance.AirdropVote && CallVote.Instance.VoteInProgress == false && CallVote.Instance.VoteInCooldown == false)
             {
                 UnturnedChat.Say(CallVote.Instance.Translate("vote_started_airdrop", player.DisplayName, CallVote.Instance.Configuration.Instance.VoteTimer), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
 
@@ -75,7 +80,7 @@ namespace Arechi.CallVote
                 return;
             }
 
-            if (command[0].ToString().ToLower() == "yes" && CallVote.Instance.VoteInProgress == true)
+            if (command[0].ToString().ToLower() == "yes" || command[0].ToString().ToLower() == "y" && CallVote.Instance.VoteInProgress == true)
             {
                 if (!CallVote.Instance.voteTracker.ContainsKey(player.CSteamID))
                 {
@@ -92,19 +97,21 @@ namespace Arechi.CallVote
                 return;
             }
 
-            if (command[0].ToString().ToLower() == "day" || command[0].ToString().ToLower() == "night" || command[0].ToString().ToLower() == "storm" || command[0].ToString().ToLower() == "airdrop" && CallVote.Instance.VoteInProgress == true)
+            if (command[0].ToString().ToLower() == "day" || command[0].ToString().ToLower() == "night" || command[0].ToString().ToLower() == "rain" || command[0].ToString().ToLower() == "airdrop" ||
+                command[0].ToString().ToLower() == "d" || command[0].ToString().ToLower() == "n" || command[0].ToString().ToLower() == "r" || command[0].ToString().ToLower() == "a" && CallVote.Instance.VoteInProgress == true)
             {
                 UnturnedChat.Say(player, CallVote.Instance.Translate("vote_error"), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
                 return;
             }
 
-            if (command[0].ToString().ToLower() == "day" || command[0].ToString().ToLower() == "night" || command[0].ToString().ToLower() == "storm" || command[0].ToString().ToLower() == "airdrop" && CallVote.Instance.VoteInCooldown == true)
+            if (command[0].ToString().ToLower() == "day" || command[0].ToString().ToLower() == "night" || command[0].ToString().ToLower() == "rain" || command[0].ToString().ToLower() == "airdrop" ||
+                command[0].ToString().ToLower() == "d" || command[0].ToString().ToLower() == "n" || command[0].ToString().ToLower() == "r" || command[0].ToString().ToLower() == "a" && CallVote.Instance.VoteInCooldown == true)
             {
                 UnturnedChat.Say(player, CallVote.Instance.Translate("vote_cooldown", CallVote.Instance.Configuration.Instance.VoteCooldown), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
                 return;
             }
 
-            if (command[0].ToString().ToLower() == "yes" && CallVote.Instance.VoteInProgress == false)
+            if (command[0].ToString().ToLower() == "yes" || command[0].ToString().ToLower() == "y" && CallVote.Instance.VoteInProgress == false)
             {
                 UnturnedChat.Say(player, CallVote.Instance.Translate("no_ongoing_votes"), Color.red);
                 return;

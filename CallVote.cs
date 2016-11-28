@@ -63,6 +63,7 @@ namespace Arechi.CallVote
                     {"vote_ongoing", "{0}% Yes. Required: {1}%." },
                     {"already_voted", "You have already voted!" },
                     {"vote_error", "Only one vote may be called at a time." },
+                    {"vote_help", "The kind of votes are: Day, Night, Rain and Airdrop. You can vote with /cvote yes|y or start one with /cvote d|n|r|a" },
                     {"vote_disabled", "This type of vote is disabled on the server." },
                     {"vote_cooldown", "A vote may only be called every {0} seconds." },
                     {"no_ongoing_votes", "There are no votes currently active." },

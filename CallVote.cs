@@ -88,12 +88,12 @@ namespace Arechi.CallVote
                 percentFor = Math.Round(percentFor, 2);
                 if (percentFor >= Instance.Configuration.Instance.RequiredPercent)
                 {
-                    UnturnedChat.Say(Instance.DefaultTranslations.Translate(kind + "_success"), UnturnedChat.GetColorFromName(Instance.Configuration.Instance.Color, Color.yellow));
+                    UnturnedChat.Say(Instance.Translate(kind + "_success"), UnturnedChat.GetColorFromName(Instance.Configuration.Instance.Color, Color.yellow));
                     CommandWindow.input.onInputText(kind);
                 }
                 else if (percentFor < Instance.Configuration.Instance.RequiredPercent)
                 {
-                    UnturnedChat.Say(Instance.DefaultTranslations.Translate(kind + "_failed"), Color.red);
+                    UnturnedChat.Say(Instance.Translate(kind + "_failed"), Color.red);
                 }
                 Instance.voteTracker.Clear();
                 Instance.VoteInCooldown = true;

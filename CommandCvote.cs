@@ -50,7 +50,7 @@ namespace Arechi.CallVote
 
             if (command[0].ToString().ToLower() == "day" || command[0].ToString().ToLower() == "night" && CallVote.Instance.Configuration.Instance.DayNightVote && CallVote.Instance.VoteInProgress == false && CallVote.Instance.VoteInCooldown == false)
             {
-                UnturnedChat.Say(CallVote.Instance.DefaultTranslations.Translate("vote_started", player.DisplayName, command[0], CallVote.Instance.Configuration.Instance.VoteTimer), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
+                UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, command[0], CallVote.Instance.Configuration.Instance.VoteTimer), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
 
                 CallVote.Instance.VoteInProgress = true;
                 CallVote.initiateVote(command[0]);
@@ -59,7 +59,7 @@ namespace Arechi.CallVote
 
             if (command[0].ToString().ToLower() ==  "rain" && CallVote.Instance.Configuration.Instance.RainVote && CallVote.Instance.VoteInProgress == false && CallVote.Instance.VoteInCooldown == false)
             {
-                UnturnedChat.Say(CallVote.Instance.DefaultTranslations.Translate("vote_started_storm", player.DisplayName, CallVote.Instance.Configuration.Instance.VoteTimer), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
+                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_storm", player.DisplayName, CallVote.Instance.Configuration.Instance.VoteTimer), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
 
                 CallVote.Instance.VoteInProgress = true;
                 CallVote.initiateVote("storm");
@@ -68,7 +68,7 @@ namespace Arechi.CallVote
 
             if (command[0].ToString().ToLower() == "airdrop" && CallVote.Instance.Configuration.Instance.AirdropVote && CallVote.Instance.VoteInProgress == false && CallVote.Instance.VoteInCooldown == false)
             {
-                UnturnedChat.Say(CallVote.Instance.DefaultTranslations.Translate("vote_started_airdrop", player.DisplayName, CallVote.Instance.Configuration.Instance.VoteTimer), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
+                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_airdrop", player.DisplayName, CallVote.Instance.Configuration.Instance.VoteTimer), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
 
                 CallVote.Instance.VoteInProgress = true;
                 CallVote.initiateVote(command[0]);
@@ -82,31 +82,31 @@ namespace Arechi.CallVote
                     CallVote.Instance.totalFor += 1;
                     double percentFor = (double)(CallVote.Instance.totalFor / CallVote.Instance.onlinePlayers) * 100;
 
-                    UnturnedChat.Say(CallVote.Instance.DefaultTranslations.Translate("vote_ongoing", percentFor, CallVote.Instance.Configuration.Instance.RequiredPercent), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
+                    UnturnedChat.Say(CallVote.Instance.Translate("vote_ongoing", percentFor, CallVote.Instance.Configuration.Instance.RequiredPercent), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
                     CallVote.Instance.voteTracker.Add(player.CSteamID, player.CharacterName);
                 }
                 else if (CallVote.Instance.voteTracker.ContainsKey(player.CSteamID))
                 {
-                    UnturnedChat.Say(player, CallVote.Instance.DefaultTranslations.Translate("already_voted"), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
+                    UnturnedChat.Say(player, CallVote.Instance.Translate("already_voted"), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
                 }
                 return;
             }
 
             if (command[0].ToString().ToLower() == "day" || command[0].ToString().ToLower() == "night" || command[0].ToString().ToLower() == "storm" || command[0].ToString().ToLower() == "airdrop" && CallVote.Instance.VoteInProgress == true)
             {
-                UnturnedChat.Say(player, CallVote.Instance.DefaultTranslations.Translate("vote_error"), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
+                UnturnedChat.Say(player, CallVote.Instance.Translate("vote_error"), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
                 return;
             }
 
             if (command[0].ToString().ToLower() == "day" || command[0].ToString().ToLower() == "night" || command[0].ToString().ToLower() == "storm" || command[0].ToString().ToLower() == "airdrop" && CallVote.Instance.VoteInCooldown == true)
             {
-                UnturnedChat.Say(player, CallVote.Instance.DefaultTranslations.Translate("vote_cooldown", CallVote.Instance.Configuration.Instance.VoteCooldown), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
+                UnturnedChat.Say(player, CallVote.Instance.Translate("vote_cooldown", CallVote.Instance.Configuration.Instance.VoteCooldown), UnturnedChat.GetColorFromName(CallVote.Instance.Configuration.Instance.Color, Color.yellow));
                 return;
             }
 
             if (command[0].ToString().ToLower() == "yes" && CallVote.Instance.VoteInProgress == false)
             {
-                UnturnedChat.Say(player, CallVote.Instance.DefaultTranslations.Translate("no_ongoing_votes"), Color.red);
+                UnturnedChat.Say(player, CallVote.Instance.Translate("no_ongoing_votes"), Color.red);
                 return;
             }
         }

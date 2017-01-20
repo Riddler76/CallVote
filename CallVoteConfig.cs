@@ -5,7 +5,7 @@ namespace Arechi.CallVote
     public class CallVoteConfig : IRocketPluginConfiguration
     {
         public string Color;
-        public bool DayNightVote, RainVote, AirdropVote;
+        public bool DayVote, NightVote, RainVote, AirdropVote, AirdropAllVote, HealAllVote, VehicleAllVote, KickVote, CustomVote, FinishVoteEarly, NotifyCooldownOver;
         public int VoteTimer;
         public int VoteCooldown;
         public int RequiredPercent;
@@ -13,9 +13,17 @@ namespace Arechi.CallVote
         public void LoadDefaults()
         {
             Color = "yellow";
-            DayNightVote = true;
+            FinishVoteEarly = true;
+            NotifyCooldownOver = false;
+            DayVote = true;
+            NightVote = true;
             RainVote = true;
             AirdropVote = true;
+            AirdropAllVote = true;
+            HealAllVote = false;
+            VehicleAllVote = false;
+            KickVote = true;
+            CustomVote = true;
             VoteTimer = 50;
             VoteCooldown = 50;
             RequiredPercent = 60;

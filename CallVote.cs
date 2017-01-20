@@ -187,7 +187,6 @@ namespace Arechi.CallVote
             
             Instance.VoteInCooldown = true;
             Instance.VoteInProgress = false;
-            Instance.Voters.Clear();
 
             InitiateVoteCooldown();
         }
@@ -254,6 +253,7 @@ namespace Arechi.CallVote
         {
             new Thread(() =>
             {
+                Instance.Voters.Clear();
                 Thread.CurrentThread.IsBackground = true;
                 Thread.Sleep(Instance.Configuration.Instance.VoteCooldown * 1000);
 

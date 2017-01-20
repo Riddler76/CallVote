@@ -225,8 +225,16 @@ namespace Arechi.CallVote
 
                 if (Instance.VoteInCooldown == true) return;
 
-                double VotesFor = Math.Round((double)(Instance.Voters.Count / Provider.clients.Count) * 100, 2);
-
+                double VotesFor;
+                if (Provider.clients.Count == 1)
+                {
+                    VotesFor = 100;
+                }
+                else
+                {
+                    VotesFor = Math.Round((double)Instance.Voters.Count / Provider.clients.Count, 2);
+                }
+                    
                 if (VotesFor >= Instance.Configuration.Instance.RequiredPercent)
                 {
                     UnturnedChat.Say(Instance.Translate(kind.ToLower() + "_success"), Instance.MessageColor);

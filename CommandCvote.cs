@@ -186,7 +186,15 @@ namespace Arechi.CallVote
                 if (!CallVote.Instance.Voters.Contains(player.CSteamID))
                 {
                     CallVote.Instance.Voters.Add(player.CSteamID);
-                    double VotesFor = Math.Round((double)(CallVote.Instance.Voters.Count / Provider.clients.Count) * 100, 2);
+                    double VotesFor;
+                    if (Provider.clients.Count == 1)
+                    {
+                        VotesFor = 100;
+                    }
+                    else
+                    {
+                        VotesFor = Math.Round((double)CallVote.Instance.Voters.Count / Provider.clients.Count, 2);
+                    }
                     UnturnedChat.Say(CallVote.Instance.Translate("vote_ongoing", VotesFor, CallVote.Instance.Configuration.Instance.RequiredPercent), CallVote.Instance.MessageColor);
                     if (VotesFor >= CallVote.Instance.Configuration.Instance.RequiredPercent && CallVote.Instance.Configuration.Instance.FinishVoteEarly == true)
                     {

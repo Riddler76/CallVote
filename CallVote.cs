@@ -52,13 +52,14 @@ namespace Arechi.CallVote
                     {"vote_started_airdropall", "{0} has called a vote to summon an Airdrop for everyone. You have {1} seconds to type /cvote yes to vote." },
                     {"vote_started_healall", "{0} has called a vote to heal everyone. You have {1} seconds to type /cvote yes to vote." },
                     {"vote_started_vehicleall", "{0} has called a vote to give everyone a random vehicle. You have {1} seconds to type /cvote yes to vote." },
+                    {"vote_started_unlock", "{0} has called a vote to unlock every vehicle. You have {1} seconds to type /cvote yes to vote." },
                     {"vote_started_kick", "{0} has called a vote to kick {2}. You have {1} seconds to type /cvote yes to vote." },
                     {"vote_started_spy", "{0} has called a vote to spy someone together. You have {1} seconds to type /cvote yes to vote." },
                     {"vote_started_custom", "{0} has called a vote to {2}. You have {1} seconds to type /cvote yes to vote." },
                     {"vote_ongoing", "{0}% Yes. Required: {1}%." },
                     {"already_voted", "You have already voted!" },
                     {"vote_error", "Only one vote may be called at a time." },
-                    {"vote_help", "The kind of votes are: Day, Night, Rain, Airdrop(all), HealAll, VehicleAll, Kick, Spy and Custom. You can vote with /cvote yes|y or start one with /cvote d|n|r|a|h|v|k|s|c" },
+                    {"vote_help", "The kind of votes are: Day, Night, Rain, Airdrop(all), HealAll, VehicleAll, Unlock, Kick, Spy and Custom. You can vote with /cvote yes|y or start one with /cvote d|n|r|a|h|v|u|k|s|c" },
                     {"vote_disabled", "This type of vote is disabled on the server." },
                     {"vote_cooldown", "A vote may only be called every {0} seconds." },
                     {"cooldown_over", "The vote cooldown is over. You can start another vote if desired." },
@@ -77,6 +78,8 @@ namespace Arechi.CallVote
                     {"healall_failed", "The vote to heal everyone was unsuccessful."},
                     {"vehicleall_success", "The vote to give everyone a random vehicle was successful." },
                     {"vehicleall_failed", "The vote to give everyone a random vehicle was unsuccessful."},
+                    {"unlock_success", "The vote to unlock every vehicle was successful." },
+                    {"unlock_failed", "The vote to unlock every vehicle was unsuccessful."},
                     {"custom_success", "The custom vote was successful." },
                     {"custom_failed", "The custom vote was unsuccessful."},
                     {"kick_success", "The kick vote was successful." },
@@ -138,6 +141,22 @@ namespace Arechi.CallVote
             }
         }
 
+        public void Unlock()
+        {
+            using (List<InteractableVehicle>.Enumerator enumerator = VehicleManager.vehicles.GetEnumerator())
+            {
+                while (enumerator.MoveNext())
+                {
+                    InteractableVehicle vehicle = enumerator.Current;
+
+                    if (vehicle != null)
+                    {
+                        VehicleManager.unlockVehicle(vehicle);
+                    }
+                }
+            }
+        }
+
         public void Kick()
         {
             Provider.kick(PlayerToKick, Instance.Translate("kick_reason"));
@@ -168,13 +187,17 @@ namespace Arechi.CallVote
             {
                 VehicleAll();
             }
+            else if (Instance.CurrentVote == "unlock")
+            {
+                Unlock();
+            }
             else if (Instance.CurrentVote == "kick")
             {
                 Kick();
             }
             else if (Instance.CurrentVote == "spy")
             {
-                Instance.Spy();
+                Spy();
             }
             else if (Instance.CurrentVote == "custom")
             {
@@ -218,6 +241,10 @@ namespace Arechi.CallVote
                     else if (Instance.CurrentVote == "vehicleall")
                     {
                         Instance.VehicleAll();
+                    }
+                    else if (Instance.CurrentVote == "unlock")
+                    {
+                        Instance.Unlock();
                     }
                     else if (Instance.CurrentVote == "kick")
                     {

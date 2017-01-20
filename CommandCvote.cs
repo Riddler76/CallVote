@@ -37,7 +37,7 @@ namespace Arechi.CallVote
 
         public string Syntax
         {
-            get { return "day|night|rain|airdrop|airdropall|healall|vehicleall|kick|spy|custom|yes or d|n|r|a|y|h|v|k|s|c"; }
+            get { return "<vote>|<vote alias>|yes|y"; }
         }
 
         public void Execute(IRocketPlayer caller, string[] command)
@@ -52,6 +52,7 @@ namespace Arechi.CallVote
             bool AirdropAllAllowed = CallVote.Instance.Configuration.Instance.AirdropAllVote;
             bool HealAllAllowed = CallVote.Instance.Configuration.Instance.HealAllVote;
             bool VehicleAllAllowed = CallVote.Instance.Configuration.Instance.VehicleAllVote;
+            bool UnlockAllowed = CallVote.Instance.Configuration.Instance.UnlockVote;
             bool KickAllowed = CallVote.Instance.Configuration.Instance.KickVote;
             bool SpyAllowed = CallVote.Instance.Configuration.Instance.SpyVote;
             bool CustomAllowed = CallVote.Instance.Configuration.Instance.CustomVote;
@@ -126,6 +127,15 @@ namespace Arechi.CallVote
                 if (!player.HasPermission("cvote.vehicleall")) return;
                 CallVote.StartVote("Vehicleall");
                 UnturnedChat.Say(CallVote.Instance.Translate("vote_started_vehicleall", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
+                return;
+            }
+
+            //Initiate Unlock all vehicles vote
+            if ((String.Compare(command[0], "Unlock", true) == 0 || String.Compare(command[0], "u", true) == 0) && UnlockAllowed == true && VoteInProgress == false && VoteInCooldown == false)
+            {
+                if (!player.HasPermission("cvote.unlock")) return;
+                CallVote.StartVote("unlock");
+                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_unlock", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
                 return;
             }
 

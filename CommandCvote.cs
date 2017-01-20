@@ -37,7 +37,7 @@ namespace Arechi.CallVote
 
         public string Syntax
         {
-            get { return "day|night|rain|airdrop|airdropall|healall|vehicleall|kick|custom|yes or d|n|r|a|y|h|v|k|c"; }
+            get { return "day|night|rain|airdrop|airdropall|healall|vehicleall|kick|spy|custom|yes or d|n|r|a|y|h|v|k|s|c"; }
         }
 
         public void Execute(IRocketPlayer caller, string[] command)
@@ -53,6 +53,7 @@ namespace Arechi.CallVote
             bool HealAllAllowed = CallVote.Instance.Configuration.Instance.HealAllVote;
             bool VehicleAllAllowed = CallVote.Instance.Configuration.Instance.VehicleAllVote;
             bool KickAllowed = CallVote.Instance.Configuration.Instance.KickVote;
+            bool SpyAllowed = CallVote.Instance.Configuration.Instance.SpyVote;
             bool CustomAllowed = CallVote.Instance.Configuration.Instance.CustomVote;
             int VoteTimer = CallVote.Instance.Configuration.Instance.VoteTimer;
             int VoteCooldown = CallVote.Instance.Configuration.Instance.VoteCooldown;
@@ -135,6 +136,16 @@ namespace Arechi.CallVote
                 CallVote.Instance.PlayerToKick = UnturnedPlayer.FromName(command[1]).CSteamID;
                 CallVote.StartVote("Kick");
                 UnturnedChat.Say(CallVote.Instance.Translate("vote_started_kick", player.DisplayName, VoteTimer, UnturnedPlayer.FromName(command[1]).DisplayName), CallVote.Instance.MessageColor);
+                return;
+            }
+
+            //Initiate Spy vote
+            if ((String.Compare(command[0], "Spy", true) == 0 || String.Compare(command[0], "s", true) == 0) && UnturnedPlayer.FromName(command[1]) != null && command.Length == 2 && SpyAllowed == true && VoteInProgress == false && VoteInCooldown == false)
+            {
+                if (!player.HasPermission("cvote.spy")) return;
+                CallVote.Instance.PlayerToSpy = UnturnedPlayer.FromName(command[1]).CSteamID;
+                CallVote.StartVote("Spy");
+                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_spy", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
                 return;
             }
 

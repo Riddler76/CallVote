@@ -19,7 +19,7 @@ namespace Arechi.CallVote
         public string CurrentVote;
         public Color MessageColor;
         public List<CSteamID> Voters;
-        public CSteamID PlayerToKick;
+        public CSteamID PlayerToKick, PlayerToSpy;
         public static CallVote Instance;
 
         protected override void Load()
@@ -53,11 +53,12 @@ namespace Arechi.CallVote
                     {"vote_started_healall", "{0} has called a vote to heal everyone. You have {1} seconds to type /cvote yes to vote." },
                     {"vote_started_vehicleall", "{0} has called a vote to give everyone a random vehicle. You have {1} seconds to type /cvote yes to vote." },
                     {"vote_started_kick", "{0} has called a vote to kick {2}. You have {1} seconds to type /cvote yes to vote." },
+                    {"vote_started_spy", "{0} has called a vote to spy someone together. You have {1} seconds to type /cvote yes to vote." },
                     {"vote_started_custom", "{0} has called a vote to {2}. You have {1} seconds to type /cvote yes to vote." },
                     {"vote_ongoing", "{0}% Yes. Required: {1}%." },
                     {"already_voted", "You have already voted!" },
                     {"vote_error", "Only one vote may be called at a time." },
-                    {"vote_help", "The kind of votes are: Day, Night, Rain, Airdrop(all), HealAll, VehicleAll, Kick and Custom. You can vote with /cvote yes|y or start one with /cvote d|n|r|a|h|v|k|c" },
+                    {"vote_help", "The kind of votes are: Day, Night, Rain, Airdrop(all), HealAll, VehicleAll, Kick, Spy and Custom. You can vote with /cvote yes|y or start one with /cvote d|n|r|a|h|v|k|s|c" },
                     {"vote_disabled", "This type of vote is disabled on the server." },
                     {"vote_cooldown", "A vote may only be called every {0} seconds." },
                     {"cooldown_over", "The vote cooldown is over. You can start another vote if desired." },
@@ -80,7 +81,10 @@ namespace Arechi.CallVote
                     {"custom_failed", "The custom vote was unsuccessful."},
                     {"kick_success", "The kick vote was successful." },
                     {"kick_failed", "The kick vote was unsuccessful."},
+                    {"spy_success", "The spy vote was successful." },
+                    {"spy_failed", "The spy vote was unsuccessful."},
                     {"kick_reason", "The majority decided so."},
+                    {"check_ready", "The spy screenshot is ready for {0}. Press ESC to check it out."},
                 };
             }
         }
@@ -139,6 +143,16 @@ namespace Arechi.CallVote
             Provider.kick(PlayerToKick, Instance.Translate("kick_reason"));
         }
 
+        public void Spy()
+        {
+            foreach (var p in Provider.clients)
+            {
+                if (p.playerID.steamID == PlayerToSpy) return;
+                p.player.sendScreenshot(PlayerToSpy);
+                UnturnedChat.Say(UnturnedPlayer.FromCSteamID(p.playerID.steamID), Instance.Translate("check_ready", UnturnedPlayer.FromCSteamID(PlayerToSpy).DisplayName), MessageColor);
+            }
+        }
+
         public void FinishVoteNow()
         {
             UnturnedChat.Say(Instance.Translate(CurrentVote + "_success"), UnturnedChat.GetColorFromName(Instance.Configuration.Instance.Color, Color.yellow));
@@ -157,6 +171,10 @@ namespace Arechi.CallVote
             else if (Instance.CurrentVote == "kick")
             {
                 Kick();
+            }
+            else if (Instance.CurrentVote == "spy")
+            {
+                Instance.Spy();
             }
             else if (Instance.CurrentVote == "custom")
             {
@@ -205,6 +223,10 @@ namespace Arechi.CallVote
                     else if (Instance.CurrentVote == "kick")
                     {
                         Instance.Kick();
+                    }
+                    else if (Instance.CurrentVote == "spy")
+                    {
+                        Instance.Spy();
                     }
                     else if (Instance.CurrentVote == "custom")
                     {

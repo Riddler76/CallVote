@@ -60,7 +60,8 @@ namespace Arechi.CallVote
             //Command usage
             if (command.Length == 0)
             {
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_help"), CallVote.Instance.MessageColor);
+                UnturnedChat.Say(player, CallVote.Instance.Translate("vote_help"), CallVote.Instance.MessageColor);
+                return;
             }
 
             #region Initiating Votes

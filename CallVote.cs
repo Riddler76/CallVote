@@ -164,11 +164,14 @@ namespace Arechi.CallVote
 
         public void Spy()
         {
+            UnturnedPlayer player = UnturnedPlayer.FromCSteamID(PlayerToSpy);
             foreach (var p in Provider.clients)
             {
-                if (p.playerID.steamID == PlayerToSpy) return;
-                p.player.sendScreenshot(PlayerToSpy);
-                UnturnedChat.Say(UnturnedPlayer.FromCSteamID(p.playerID.steamID), Instance.Translate("check_ready", UnturnedPlayer.FromCSteamID(PlayerToSpy).DisplayName), MessageColor);
+                if (p.playerID.steamID != player.CSteamID)
+                {
+                    player.Player.sendScreenshot(p.playerID.steamID);
+                    UnturnedChat.Say(UnturnedPlayer.FromCSteamID(p.playerID.steamID), Instance.Translate("check_ready", UnturnedPlayer.FromCSteamID(PlayerToSpy).DisplayName), MessageColor);
+                }
             }
         }
 
@@ -225,16 +228,8 @@ namespace Arechi.CallVote
 
                 if (Instance.VoteInCooldown == true) return;
 
-                double VotesFor;
-                if (Provider.clients.Count == 1)
-                {
-                    VotesFor = 100;
-                }
-                else
-                {
-                    VotesFor = Math.Round((double)Instance.Voters.Count / Provider.clients.Count, 2);
-                }
-                    
+                int VotesFor = (int)Math.Round((decimal)Instance.Voters.Count / Provider.clients.Count * 100);
+                   
                 if (VotesFor >= Instance.Configuration.Instance.RequiredPercent)
                 {
                     UnturnedChat.Say(Instance.Translate(kind.ToLower() + "_success"), Instance.MessageColor);

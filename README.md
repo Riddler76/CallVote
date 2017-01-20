@@ -1,14 +1,17 @@
 # CallVote
 Rocket plugin for Unturned to vote for things to happen
 
-Current features:
-- Vote to make it day/night/(stop)rain/airdrop
-- Config to change color or disable specific votes
-- Translation file to change the messages
+Current votes:
+- Day
+- Night
+- (Start/Stop) Rain
+- Airdrop (random on map)
+- Airdropall (random but at every player's spot)
+- Healall (heal everyone)
+- Vehicleall (random vanilla vehicle for everyone)
+- Kick <playername> (kick someone)
+- Custom <Text> (does nothing)
 
-Planned features:
-- Fixing the percent shown (request a pull if you could help with it)
-- Make the command show all kind of votes
-- Add permissions for each vote
+All votes can be enabled/disabled in config and require the permission cvote and cvote.<vote>
 
 Any suggestions?

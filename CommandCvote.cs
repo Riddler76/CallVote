@@ -37,7 +37,7 @@ namespace Arechi.CallVote
 
         public string Syntax
         {
-            get { return "<vote>|<vote alias>"; }
+            get { return "<vote name|alias>"; }
         }
 
         public void Execute(IRocketPlayer caller, string[] command)

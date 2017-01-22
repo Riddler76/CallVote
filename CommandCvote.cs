@@ -1,7 +1,7 @@
 ﻿using Rocket.API;
 using Rocket.Unturned.Chat;
+using Rocket.Unturned.Items;
 using Rocket.Unturned.Player;
-using SDG.Unturned;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,7 +12,7 @@ namespace Arechi.CallVote
     {
         public List<string> Aliases
         {
-            get { return new List<string>(); }
+            get { return new List<string>() { "cv" }; }
         }
 
         public AllowedCaller AllowedCaller
@@ -37,7 +37,7 @@ namespace Arechi.CallVote
 
         public string Syntax
         {
-            get { return "<vote>|<vote alias>|yes|y"; }
+            get { return "<vote>|<vote alias>"; }
         }
 
         public void Execute(IRocketPlayer caller, string[] command)
@@ -45,180 +45,99 @@ namespace Arechi.CallVote
             UnturnedPlayer player = (UnturnedPlayer)caller;
             bool VoteInProgress = CallVote.Instance.VoteInProgress;
             bool VoteInCooldown = CallVote.Instance.VoteInCooldown;
-            bool DayAllowed = CallVote.Instance.Configuration.Instance.DayVote;
-            bool NightAllowed = CallVote.Instance.Configuration.Instance.NightVote;
-            bool RainAllowed = CallVote.Instance.Configuration.Instance.RainVote;
-            bool AirdropAllowed = CallVote.Instance.Configuration.Instance.AirdropVote;
-            bool AirdropAllAllowed = CallVote.Instance.Configuration.Instance.AirdropAllVote;
-            bool HealAllAllowed = CallVote.Instance.Configuration.Instance.HealAllVote;
-            bool VehicleAllAllowed = CallVote.Instance.Configuration.Instance.VehicleAllVote;
-            bool UnlockAllowed = CallVote.Instance.Configuration.Instance.UnlockVote;
-            bool KickAllowed = CallVote.Instance.Configuration.Instance.KickVote;
-            bool SpyAllowed = CallVote.Instance.Configuration.Instance.SpyVote;
-            bool CustomAllowed = CallVote.Instance.Configuration.Instance.CustomVote;
             int VoteTimer = CallVote.Instance.Configuration.Instance.VoteTimer;
             int VoteCooldown = CallVote.Instance.Configuration.Instance.VoteCooldown;
 
-            //Command usage
             if (command.Length == 0)
             {
-                UnturnedChat.Say(player, CallVote.Instance.Translate("vote_help"), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            #region Initiating Votes
-            //Initiate Day vote
-            if ((String.Compare(command[0], "Day", true) == 0 || String.Compare(command[0], "d", true) == 0) && DayAllowed == true && VoteInProgress == false && VoteInCooldown == false)
-            {
-                if (!player.HasPermission("cvote.day")) return;
-                CallVote.StartVote("Day");
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_day", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            //Initiate Night vote
-            if ((String.Compare(command[0], "Night", true) == 0 || String.Compare(command[0], "n", true) == 0) && NightAllowed == true && VoteInProgress == false && VoteInCooldown == false)
-            {
-                if (!player.HasPermission("cvote.night")) return;
-                CallVote.StartVote("Night");
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_night", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            //Initiate Rain vote
-            if ((String.Compare(command[0], "Rain", true) == 0 || String.Compare(command[0], "r", true) == 0) && RainAllowed == true && VoteInProgress == false && VoteInCooldown == false)
-            {
-                if (!player.HasPermission("cvote.rain")) return;
-                CallVote.StartVote("Storm");
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_storm", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            //Initiate Airdrop vote
-            if ((String.Compare(command[0], "Airdrop", true) == 0 || String.Compare(command[0], "a", true) == 0) && AirdropAllowed == true && VoteInProgress == false && VoteInCooldown == false)
-            {
-                if (!player.HasPermission("cvote.airdrop")) return;
-                CallVote.StartVote("Airdrop");
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_airdrop", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            //Initiate Airdrop All vote
-            if (String.Compare(command[0], "Airdropall", true) == 0 && AirdropAllAllowed == true && VoteInProgress == false && VoteInCooldown == false)
-            {
-                if (!player.HasPermission("cvote.airdropall")) return;
-                CallVote.StartVote("Airdropall");
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_airdropall", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            //Initiate Heal All vote
-            if ((String.Compare(command[0], "Healall", true) == 0 || String.Compare(command[0], "h", true) == 0) && HealAllAllowed == true && VoteInProgress == false && VoteInCooldown == false)
-            {
-                if (!player.HasPermission("cvote.healall")) return;
-                CallVote.StartVote("Healall");
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_healall", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            //Initiate Vehicle All vote
-            if ((String.Compare(command[0], "Vehicleall", true) == 0 || String.Compare(command[0], "v", true) == 0) && VehicleAllAllowed == true && VoteInProgress == false && VoteInCooldown == false)
-            {
-                if (!player.HasPermission("cvote.vehicleall")) return;
-                CallVote.StartVote("Vehicleall");
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_vehicleall", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            //Initiate Unlock all vehicles vote
-            if ((String.Compare(command[0], "Unlock", true) == 0 || String.Compare(command[0], "u", true) == 0) && UnlockAllowed == true && VoteInProgress == false && VoteInCooldown == false)
-            {
-                if (!player.HasPermission("cvote.unlock")) return;
-                CallVote.StartVote("unlock");
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_unlock", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            //Initiate Kick vote
-            if ((String.Compare(command[0], "Kick", true) == 0 || String.Compare(command[0], "k", true) == 0) && UnturnedPlayer.FromName(command[1]) != null && command.Length == 2 && KickAllowed == true && VoteInProgress == false && VoteInCooldown == false)
-            {
-                if (!player.HasPermission("cvote.kick")) return;
-                CallVote.Instance.PlayerToKick = UnturnedPlayer.FromName(command[1]).CSteamID;
-                CallVote.StartVote("Kick");
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_kick", player.DisplayName, VoteTimer, UnturnedPlayer.FromName(command[1]).DisplayName), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            //Initiate Spy vote
-            if ((String.Compare(command[0], "Spy", true) == 0 || String.Compare(command[0], "s", true) == 0) && UnturnedPlayer.FromName(command[1]) != null && command.Length == 2 && SpyAllowed == true && VoteInProgress == false && VoteInCooldown == false)
-            {
-                if (!player.HasPermission("cvote.spy")) return;
-                CallVote.Instance.PlayerToSpy = UnturnedPlayer.FromName(command[1]).CSteamID;
-                CallVote.StartVote("Spy");
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_spy", player.DisplayName, VoteTimer), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            //Initiate Custom vote
-            if ((String.Compare(command[0], "Custom", true) == 0 || String.Compare(command[0], "c", true) == 0) && command.Length > 1 && CustomAllowed == true && VoteInProgress == false && VoteInCooldown == false)
-            {
-                if (!player.HasPermission("cvote.custom")) return;
-                CallVote.StartVote("Custom");
-                string Message = "";
-                for (int i = 0; i < command.Length; i++)
+                if (!VoteInProgress)
                 {
-                    if (i == 0)
-                    {
-                        continue;
-                    }
-
-                    string Word = command[i];
-                    Message += Word + " ";
+                    UnturnedChat.Say(player, CallVote.Instance.Translate("no_ongoing_votes"), Color.red);
+                    CallVote.Instance.Help(player);
                 }
-                UnturnedChat.Say(CallVote.Instance.Translate("vote_started_custom", player.DisplayName, VoteTimer, Message), CallVote.Instance.MessageColor);
+                else
+                {
+                    CallVote.Instance.Vote(player);
+                }
+                
                 return;
             }
-            #endregion
 
-            //Voting
-            if ((String.Compare(command[0], "Yes", true) == 0 || String.Compare(command[0], "y", true) == 0) && VoteInProgress == true)
+            if (command.Length == 1)
             {
-                if (!CallVote.Instance.Voters.Contains(player.CSteamID))
+                if (VoteInProgress)
                 {
-                    CallVote.Instance.Voters.Add(player.CSteamID);
-                    int VotesFor = (int)Math.Round((decimal)CallVote.Instance.Voters.Count / Provider.clients.Count * 100);
-                    UnturnedChat.Say(CallVote.Instance.Translate("vote_ongoing", VotesFor, CallVote.Instance.Configuration.Instance.RequiredPercent), CallVote.Instance.MessageColor);
-                    if (VotesFor >= CallVote.Instance.Configuration.Instance.RequiredPercent && CallVote.Instance.Configuration.Instance.FinishVoteEarly == true)
+                    UnturnedChat.Say(player, CallVote.Instance.Translate("vote_error"), CallVote.Instance.MessageColor);
+                    return;
+                }
+
+                if (VoteInCooldown)
+                {
+                    UnturnedChat.Say(player, CallVote.Instance.Translate("vote_cooldown", VoteCooldown), CallVote.Instance.MessageColor);
+                    return;
+                }
+            }
+
+            if (!VoteInProgress && !VoteInCooldown)
+            {
+                for (int i = 0; i < CallVote.Instance.Configuration.Instance.Votes.Length; i++)
+                {
+                    if (String.Compare(command[0], CallVote.Instance.Configuration.Instance.Votes[i].Name, true) == 0 || String.Compare(command[0], CallVote.Instance.Configuration.Instance.Votes[i].Alias, true) == 0)
                     {
-                        CallVote.Instance.FinishVoteNow();
+                        if (!CallVote.Instance.Configuration.Instance.Votes[i].Enabled) { CallVote.Instance.Notify(player, 1); return; }
+                        if (!player.HasPermission("cvote." + CallVote.Instance.Configuration.Instance.Votes[i].Name.ToLower())) { CallVote.Instance.Notify(player, 2); return; }
+
+                        if (command.Length == 1)
+                        {
+                            UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate(CallVote.Instance.Configuration.Instance.Votes[i].Name)), CallVote.Instance.MessageColor);
+                        }
+
+                        else if (command.Length == 2)
+                        {
+                            if (i == 7)
+                            {
+                                ushort item;
+                                ushort.TryParse(command[1], out item);
+                                CallVote.Instance.ItemToGive = item;
+                                UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate("ItemAll", UnturnedItems.GetItemAssetById(CallVote.Instance.ItemToGive).itemName)), CallVote.Instance.MessageColor);
+                            }
+                            else if (i == 9)
+                            {
+                                if (UnturnedPlayer.FromName(command[1]) != null) { CallVote.Instance.PlayerToKickOrMute = UnturnedPlayer.FromName(command[1]).CSteamID; }
+                                UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate(CallVote.Instance.Configuration.Instance.Votes[i].Name, UnturnedPlayer.FromName(command[1]).DisplayName)), CallVote.Instance.MessageColor);
+                            }
+                            else if (i == 10)
+                            {
+                                if (UnturnedPlayer.FromName(command[1]) != null) { CallVote.Instance.PlayerToKickOrMute = UnturnedPlayer.FromName(command[1]).CSteamID; }
+                                UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate(CallVote.Instance.Configuration.Instance.Votes[i].Name, UnturnedPlayer.FromName(command[1]).DisplayName, CallVote.Instance.Configuration.Instance.MuteTime)), CallVote.Instance.MessageColor);
+                            }
+                            else if (i == 11)
+                            {
+                                if (UnturnedPlayer.FromName(command[1]) != null) { CallVote.Instance.PlayerToSpy = UnturnedPlayer.FromName(command[1]).CSteamID; }
+                                UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate("Spy")), CallVote.Instance.MessageColor);
+                            }
+                        }
+
+                        else
+                        {
+                            string Message = "";
+                            for (int x = 0; x < command.Length; x++)
+                            {
+                                if (x == 0)
+                                {
+                                    continue;
+                                }
+
+                                string Word = command[x];
+                                Message += Word + " ";
+                            }
+                            UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate("Custom", Message)), CallVote.Instance.MessageColor);
+                        }
+
+                        CallVote.StartVote(CallVote.Instance.Configuration.Instance.Votes[i].Name);
+                        if (CallVote.Instance.Configuration.Instance.AutoVoteCaller) { CallVote.Instance.Vote(player); }
                     }
                 }
-                else if (CallVote.Instance.Voters.Contains(player.CSteamID))
-                {
-                    UnturnedChat.Say(player, CallVote.Instance.Translate("already_voted"), CallVote.Instance.MessageColor);
-                }
-                return;
-            }
-
-            //Initiating another vote in the middle of one
-            if (command.Length == 1 && VoteInProgress == true && (command[0].ToLower() != "yes" || command[0].ToLower() != "y"))
-            {
-                UnturnedChat.Say(player, CallVote.Instance.Translate("vote_error"), CallVote.Instance.MessageColor);
-                return;
-            }
-
-            //Nothing to vote for
-            if ((String.Compare(command[0], "Yes", true) == 0 || String.Compare(command[0], "y", true) == 0) && VoteInProgress == false)
-            {
-                UnturnedChat.Say(player, CallVote.Instance.Translate("no_ongoing_votes"), Color.red);
-                return;
-            }
-
-            //Vote in cooldown
-            if (command.Length == 1 && VoteInCooldown == true && (command[0].ToLower() != "yes" || command[0].ToLower() != "y"))
-            {
-                UnturnedChat.Say(player, CallVote.Instance.Translate("vote_cooldown", VoteCooldown), CallVote.Instance.MessageColor);
-                return;
             }
         }
     }

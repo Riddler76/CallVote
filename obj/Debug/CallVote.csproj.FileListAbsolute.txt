@@ -1,5 +1,0 @@
-C:\Users\aglim\Desktop\Plugins\CallVote\CallVote\bin\Debug\CallVote.dll
-C:\Users\aglim\Desktop\Plugins\CallVote\CallVote\bin\Debug\CallVote.pdb
-C:\Users\aglim\Desktop\Plugins\CallVote\CallVote\obj\Debug\CallVote.csprojResolveAssemblyReference.cache
-C:\Users\aglim\Desktop\Plugins\CallVote\CallVote\obj\Debug\CallVote.dll
-C:\Users\aglim\Desktop\Plugins\CallVote\CallVote\obj\Debug\CallVote.pdb

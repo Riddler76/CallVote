@@ -4,6 +4,7 @@ using Rocket.Core.Plugins;
 using Rocket.Unturned.Chat;
 using Rocket.Unturned.Items;
 using Rocket.Unturned.Player;
+using Rocket.Unturned.Skills;
 using SDG.Unturned;
 using Steamworks;
 using System;
@@ -70,7 +71,7 @@ namespace Arechi.CallVote
                     //Events
                     { "", "=============================[Events]=============================" },
                     { "vote_started", "{0} has called a {1} second vote to {2}." },
-                    { "vote_ongoing", "{0}% Yes. Required: {1}%. Type /cvote to vote." },
+                    { "vote_ongoing", "{0}% Yes. Required: {1}%. Type /cv to vote." },
                     { "vote_success", "The vote was successful." },
                     { "vote_failed", "The vote was unsuccessful." },
 
@@ -104,6 +105,7 @@ namespace Arechi.CallVote
                     { "HealAll", "Heal everyone" },
                     { "VehicleAll", "give everyone a random Vehicle" },
                     { "ItemAll", "give everyone a {0}" },
+                    { "MaxSkills", "Max everyone's skills" },
                     { "Unlock", "Unlock every Vehicle" },
                     { "Kick", "Kick {0}" },
                     { "Mute", "Mute {0} for {1} minutes" },
@@ -245,6 +247,39 @@ namespace Arechi.CallVote
             }
         }
 
+        public void MaxSkills()
+        {
+            UnturnedPlayer player;
+
+            foreach (var p in Provider.clients)
+            {
+                player = UnturnedPlayer.FromCSteamID(p.playerID.steamID);
+
+                player.SetSkillLevel(UnturnedSkill.Agriculture, 255);
+                player.SetSkillLevel(UnturnedSkill.Cooking, 255);
+                player.SetSkillLevel(UnturnedSkill.Crafting, 255);
+                player.SetSkillLevel(UnturnedSkill.Dexerity, 255);
+                player.SetSkillLevel(UnturnedSkill.Diving, 255);
+                player.SetSkillLevel(UnturnedSkill.Fishing, 255);
+                player.SetSkillLevel(UnturnedSkill.Healing, 255);
+                player.SetSkillLevel(UnturnedSkill.Immunity, 255);
+                player.SetSkillLevel(UnturnedSkill.Mechanic, 255);
+                player.SetSkillLevel(UnturnedSkill.Outdoors, 255);
+                player.SetSkillLevel(UnturnedSkill.Overkill, 255);
+                player.SetSkillLevel(UnturnedSkill.Parkour, 255);
+                player.SetSkillLevel(UnturnedSkill.Sharpshooter, 255);
+                player.SetSkillLevel(UnturnedSkill.Sneakybeaky, 255);
+                player.SetSkillLevel(UnturnedSkill.Strength, 255);
+                player.SetSkillLevel(UnturnedSkill.Survival, 255);
+                player.SetSkillLevel(UnturnedSkill.Toughness, 255);
+                player.SetSkillLevel(UnturnedSkill.Vitality, 255);
+                player.SetSkillLevel(UnturnedSkill.Warmblooded, 255);
+                player.SetSkillLevel(UnturnedSkill.Engineer, 255);
+                player.SetSkillLevel(UnturnedSkill.Exercise, 255);
+                player.SetSkillLevel(UnturnedSkill.Cardio, 255);
+            }
+        }
+
         public void Unlock()
         {
             using (List<InteractableVehicle>.Enumerator enumerator = VehicleManager.vehicles.GetEnumerator())
@@ -284,6 +319,7 @@ namespace Arechi.CallVote
             else if (CurrentVote == "HealAll") { HealAll(); }
             else if (CurrentVote == "VehicleAll") { VehicleAll(); }
             else if (CurrentVote == "ItemAll") { ItemAll(); }
+            else if (CurrentVote == "MaxSkills") { MaxSkills(); }
             else if (CurrentVote == "Unlock") { Unlock(); }
             else if (CurrentVote == "Kick") { Kick(); }
             else if (CurrentVote == "Mute") { Mute(); }
@@ -319,6 +355,7 @@ namespace Arechi.CallVote
                     else if (Instance.CurrentVote == "HealAll") { Instance.HealAll(); }
                     else if (Instance.CurrentVote == "VehicleAll") { Instance.VehicleAll(); }
                     else if (Instance.CurrentVote == "ItemAll") { Instance.ItemAll(); }
+                    else if (Instance.CurrentVote == "MaxSkills") { Instance.MaxSkills(); }
                     else if (Instance.CurrentVote == "Unlock") { Instance.Unlock(); }
                     else if (Instance.CurrentVote == "Kick") { Instance.Kick(); }
                     else if (Instance.CurrentVote == "Mute") { Instance.Mute(); }

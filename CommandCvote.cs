@@ -99,7 +99,7 @@ namespace Arechi.CallVote
                                 ushort item;
                                 ushort.TryParse(command[1], out item);
                                 CallVote.Instance.ItemToGive = item;
-                                UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate("ItemAll", UnturnedItems.GetItemAssetById(CallVote.Instance.ItemToGive).itemName)), CallVote.Instance.MessageColor);
+                                UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate(CallVote.Instance.Configuration.Instance.Votes[i].Name, UnturnedItems.GetItemAssetById(CallVote.Instance.ItemToGive).itemName)), CallVote.Instance.MessageColor);
                             }
                             else if (i == 9)
                             {
@@ -114,7 +114,7 @@ namespace Arechi.CallVote
                             else if (i == 11)
                             {
                                 if (UnturnedPlayer.FromName(command[1]) != null) { CallVote.Instance.PlayerToSpy = UnturnedPlayer.FromName(command[1]).CSteamID; }
-                                UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate("Spy")), CallVote.Instance.MessageColor);
+                                UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate(CallVote.Instance.Configuration.Instance.Votes[i].Name)), CallVote.Instance.MessageColor);
                             }
                         }
 
@@ -131,7 +131,7 @@ namespace Arechi.CallVote
                                 string Word = command[x];
                                 Message += Word + " ";
                             }
-                            UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate("Custom", Message)), CallVote.Instance.MessageColor);
+                            UnturnedChat.Say(CallVote.Instance.Translate("vote_started", player.DisplayName, VoteTimer, CallVote.Instance.Translate(CallVote.Instance.Configuration.Instance.Votes[i].Name, Message)), CallVote.Instance.MessageColor);
                         }
 
                         CallVote.StartVote(CallVote.Instance.Configuration.Instance.Votes[i].Name);

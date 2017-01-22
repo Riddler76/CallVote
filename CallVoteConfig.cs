@@ -41,7 +41,8 @@ namespace Arechi.CallVote
                 new Vote("Kick", "k", true),
                 new Vote("Mute", "m", true),
                 new Vote("Spy", "s", true),
-                new Vote("Custom", "c", true)
+                new Vote("Custom", "c", true),
+                new Vote("MaxSkills", "ms", true)
             };
         }
     }

@@ -1,5 +1,0 @@
-C:\Users\aglim\Source\Repos\CallVote\bin\Release\CallVote.dll
-C:\Users\aglim\Source\Repos\CallVote\bin\Release\CallVote.pdb
-C:\Users\aglim\Source\Repos\CallVote\obj\Release\CallVote.csprojResolveAssemblyReference.cache
-C:\Users\aglim\Source\Repos\CallVote\obj\Release\CallVote.dll
-C:\Users\aglim\Source\Repos\CallVote\obj\Release\CallVote.pdb

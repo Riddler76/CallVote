@@ -149,15 +149,8 @@ namespace Arechi.CallVote
 
         public void Notify(UnturnedPlayer player, int type)
         {
-            if (type == 1)
-            {
-                UnturnedChat.Say(player, Instance.Translate("vote_disabled"), Color.red);
-            }
-
-            if (type == 2)
-            {
-                UnturnedChat.Say(player, Instance.Translate("vote_no_permission"), Color.red);
-            }
+            if (type == 1) { UnturnedChat.Say(player, Instance.Translate("vote_disabled"), Color.red); }
+            if (type == 2) { UnturnedChat.Say(player, Instance.Translate("vote_no_permission"), Color.red); }
         }
 
         public void Vote(UnturnedPlayer player)
@@ -325,6 +318,7 @@ namespace Arechi.CallVote
             else if (CurrentVote == "Mute") { Mute(); }
             else if (CurrentVote == "Spy") { Spy(); }
             else if (CurrentVote == "Custom") { /*Well, nothing*/ }
+            else if (CurrentVote == "Rain") { CommandWindow.input.onInputText("Storm"); }
             else { CommandWindow.input.onInputText(CurrentVote); }
             
             Instance.VoteInCooldown = true;
@@ -361,6 +355,7 @@ namespace Arechi.CallVote
                     else if (Instance.CurrentVote == "Mute") { Instance.Mute(); }
                     else if (Instance.CurrentVote == "Spy") { Instance.Spy(); }
                     else if (Instance.CurrentVote == "Custom") { /*Well, nothing*/ }
+                    else if (Instance.CurrentVote == "Rain") { CommandWindow.input.onInputText("Storm"); }
                     else { CommandWindow.input.onInputText(Instance.CurrentVote); }
                 }
                 else if (VotesFor < Instance.Configuration.Instance.RequiredPercent) { UnturnedChat.Say(Instance.Translate("vote_failed"), Color.red); }

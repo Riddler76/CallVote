@@ -10,36 +10,12 @@ namespace Arechi.CallVote
 {
     public class CommandCvote : IRocketCommand
     {
-        public List<string> Aliases
-        {
-            get { return new List<string>() { "cv" }; }
-        }
-
-        public AllowedCaller AllowedCaller
-        {
-            get { return AllowedCaller.Player; }
-        }
-
-        public string Help
-        {
-            get { return "Start a vote to make something happen or simply vote for an ongoing vote"; }
-        }
-
-        public string Name
-        {
-            get { return "cvote"; }
-        }
-
-        public List<string> Permissions
-        {
-            get { return new List<string>() { "cvote" }; }
-        }
-
-        public string Syntax
-        {
-            get { return "<vote name|alias>"; }
-        }
-
+        public List<string> Aliases { get { return new List<string>() { "cv" }; } }
+        public AllowedCaller AllowedCaller { get { return AllowedCaller.Player; } }
+        public string Help { get { return "Start a vote to make something happen or simply vote for an ongoing vote"; } }
+        public string Name { get { return "cvote"; } }
+        public List<string> Permissions { get { return new List<string>() { "cvote" }; } }
+        public string Syntax { get { return "<vote name|alias>"; } }
         public void Execute(IRocketPlayer caller, string[] command)
         {
             UnturnedPlayer player = (UnturnedPlayer)caller;
@@ -55,11 +31,7 @@ namespace Arechi.CallVote
                     UnturnedChat.Say(player, CallVote.Instance.Translate("no_ongoing_votes"), Color.red);
                     CallVote.Instance.Help(player);
                 }
-                else
-                {
-                    CallVote.Instance.Vote(player);
-                }
-                
+                else { CallVote.Instance.Vote(player); }
                 return;
             }
 
@@ -123,11 +95,7 @@ namespace Arechi.CallVote
                             string Message = "";
                             for (int x = 0; x < command.Length; x++)
                             {
-                                if (x == 0)
-                                {
-                                    continue;
-                                }
-
+                                if (x == 0) { continue; }
                                 string Word = command[x];
                                 Message += Word + " ";
                             }

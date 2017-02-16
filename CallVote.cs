@@ -17,9 +17,7 @@ namespace Arechi.CallVote
 {
     public class CallVote : RocketPlugin<CallVoteConfig>
     {
-        public bool VoteInProgress = false;
-        public bool VoteInCooldown = false;
-        public bool VoteFinished = false;
+        public bool VoteInProgress, VoteInCooldown, VoteFinished;
         public string CurrentVote;
         public ushort ItemToGive;
         public Color MessageColor;
@@ -32,11 +30,15 @@ namespace Arechi.CallVote
         {
             Instance = this;
             MessageColor = UnturnedChat.GetColorFromName(Instance.Configuration.Instance.Color, Color.yellow);
+            VoteInProgress = false;
+            VoteInCooldown = false;
+            VoteFinished = false;
             Voters = new List<CSteamID>();
             if (Instance.Configuration.Instance.Votes[10].Enabled) { MutedPlayers = new Dictionary<CSteamID, DateTime>(); ; Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerChatted += OnChatted; }
             Logger.LogWarning("================[CallVote]================");
             Logger.Log("Timer: " + Instance.Configuration.Instance.VoteTimer + " seconds");
             Logger.Log("Cooldown: " + Instance.Configuration.Instance.VoteCooldown + " seconds");
+            Logger.Log("Required Players: " + Instance.Configuration.Instance.MinimumPlayers);
             Logger.Log("Required Percent: " + Instance.Configuration.Instance.RequiredPercent + "%");
             if (Instance.Configuration.Instance.Votes[10].Enabled) { Logger.Log("Mute Time: " + Instance.Configuration.Instance.MuteTime + " minutes"); }
             Logger.LogWarning("================[Features]================");
@@ -54,6 +56,7 @@ namespace Arechi.CallVote
         protected override void Unload()
         {
             Voters.Clear();
+            MutedPlayers.Clear();
             if (Instance.Configuration.Instance.Votes[10].Enabled) { MutedPlayers.Clear(); Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerChatted -= OnChatted; }
             Logger.LogWarning("CallVote has been unloaded!");
         }
@@ -79,6 +82,7 @@ namespace Arechi.CallVote
                     { "", "===========================[Rejections]===========================" },
                     { "already_voted", "You have already voted!" },
                     { "no_ongoing_votes", "There are no votes currently active." },
+                    { "not_enough_players", "At least {0} players are required to start a vote!" },
                     { "vote_cooldown", "A vote may only be called every {0} seconds." },
                     { "vote_disabled", "This type of vote is disabled on the server." },
                     { "vote_no_permission", "This type of vote is not permitted for you." },
@@ -113,6 +117,12 @@ namespace Arechi.CallVote
                     { "Custom", "{0}" },
                 };
             }
+        }
+
+        public static bool PlayerRequirement()
+        {
+            if (Provider.clients.Count < Instance.Configuration.Instance.MinimumPlayers) { return false; }
+            else return true;
         }
 
         private void OnChatted(UnturnedPlayer player, ref Color color, string message, EChatMode chatMode, ref bool cancel)
@@ -153,11 +163,16 @@ namespace Arechi.CallVote
             if (type == 2) { UnturnedChat.Say(player, Instance.Translate("vote_no_permission"), Color.red); }
         }
 
-        public void Vote(UnturnedPlayer player)
+        public void Vote(IRocketPlayer player)
         {
-            if (!Instance.Voters.Contains(player.CSteamID))
+            if (player is ConsolePlayer)
             {
-                Instance.Voters.Add(player.CSteamID);
+                UnturnedChat.Say(Instance.Translate("vote_ongoing", 0, Instance.Configuration.Instance.RequiredPercent), Instance.MessageColor);
+                return;
+            }
+            if (!Instance.Voters.Contains(((UnturnedPlayer)player).CSteamID))
+            {
+                Instance.Voters.Add(((UnturnedPlayer)player).CSteamID);
                 int VotesFor = (int)Math.Round((decimal)Instance.Voters.Count / Provider.clients.Count * 100);
                 UnturnedChat.Say(Instance.Translate("vote_ongoing", VotesFor, Instance.Configuration.Instance.RequiredPercent), Instance.MessageColor);
                 if (VotesFor >= Instance.Configuration.Instance.RequiredPercent && Instance.Configuration.Instance.FinishVoteEarly == true)
@@ -165,7 +180,7 @@ namespace Arechi.CallVote
                     Instance.FinishVoteNow();
                 }
             }
-            else if (Instance.Voters.Contains(player.CSteamID))
+            else if (Instance.Voters.Contains(((UnturnedPlayer)player).CSteamID))
             {
                 UnturnedChat.Say(player, Instance.Translate("already_voted"), Instance.MessageColor);
             }

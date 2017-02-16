@@ -7,10 +7,7 @@ namespace Arechi.CallVote
     {
         public string Color;
         public bool FinishVoteEarly, NotifyCooldownOver, AutoVoteCaller;
-        public int VoteTimer;
-        public int VoteCooldown;
-        public int RequiredPercent;
-        public int MuteTime;
+        public int VoteTimer, VoteCooldown, RequiredPercent, MuteTime, MinimumPlayers;
 
         [XmlArrayItem("Vote")]
         [XmlArray(ElementName = "Votes")]
@@ -22,6 +19,7 @@ namespace Arechi.CallVote
             AutoVoteCaller = true;
             FinishVoteEarly = true;
             NotifyCooldownOver = false;
+            MinimumPlayers = 0;
             VoteTimer = 50;
             VoteCooldown = 50;
             RequiredPercent = 60;

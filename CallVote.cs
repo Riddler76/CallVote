@@ -177,7 +177,7 @@ namespace Arechi.CallVote
                 UnturnedChat.Say(Instance.Translate("vote_ongoing", VotesFor, Instance.Configuration.Instance.RequiredPercent), Instance.MessageColor);
                 if (VotesFor >= Instance.Configuration.Instance.RequiredPercent && Instance.Configuration.Instance.FinishVoteEarly == true)
                 {
-                    Instance.FinishVoteNow();
+                    Instance.FinishVote();
                 }
             }
             else if (Instance.Voters.Contains(((UnturnedPlayer)player).CSteamID))
@@ -319,23 +319,37 @@ namespace Arechi.CallVote
             }
         }
 
-        public void FinishVoteNow()
+        public void FinishVote()
         {
             UnturnedChat.Say(Instance.Translate("vote_success"), MessageColor);
 
-            if (CurrentVote == "AirdropAll") { AirdropAll(); }
-            else if (CurrentVote == "HealAll") { HealAll(); }
-            else if (CurrentVote == "VehicleAll") { VehicleAll(); }
-            else if (CurrentVote == "ItemAll") { ItemAll(); }
-            else if (CurrentVote == "MaxSkills") { MaxSkills(); }
-            else if (CurrentVote == "Unlock") { Unlock(); }
-            else if (CurrentVote == "Kick") { Kick(); }
-            else if (CurrentVote == "Mute") { Mute(); }
-            else if (CurrentVote == "Spy") { Spy(); }
-            else if (CurrentVote == "Custom") { /*Well, nothing*/ }
-            else if (CurrentVote == "Rain") { CommandWindow.input.onInputText("Storm"); }
-            else { CommandWindow.input.onInputText(CurrentVote); }
-            
+            try
+            {
+                switch (CurrentVote)
+                {
+                    case "AirdropAll": AirdropAll(); break;
+                    case "HealAll": HealAll(); break;
+                    case "VehicleAll": VehicleAll(); break;
+                    case "ItemAll": ItemAll(); break;
+                    case "MaxSkills": MaxSkills(); break;
+                    case "Unlock": Unlock(); break;
+                    case "Kick": Kick(); break;
+                    case "Mute": Mute(); break;
+                    case "Spy": Spy(); break;
+                    case "Custom": /*Nothing*/ break;
+                    case "Rain": CommandWindow.input.onInputText("Storm"); break;
+                    default: CommandWindow.input.onInputText(CurrentVote); break;
+                }
+                Cooldown();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
+
+        public void Cooldown()
+        {
             Instance.VoteInCooldown = true;
             Instance.VoteInProgress = false;
             Instance.VoteFinished = true;
@@ -356,29 +370,8 @@ namespace Arechi.CallVote
 
                 int VotesFor = (int)Math.Round((decimal)Instance.Voters.Count / Provider.clients.Count * 100);
                    
-                if (VotesFor >= Instance.Configuration.Instance.RequiredPercent)
-                {
-                    UnturnedChat.Say(Instance.Translate("vote_success"), Instance.MessageColor);
-
-                    if (Instance.CurrentVote == "AirdropAll") { Instance.AirdropAll(); }
-                    else if (Instance.CurrentVote == "HealAll") { Instance.HealAll(); }
-                    else if (Instance.CurrentVote == "VehicleAll") { Instance.VehicleAll(); }
-                    else if (Instance.CurrentVote == "ItemAll") { Instance.ItemAll(); }
-                    else if (Instance.CurrentVote == "MaxSkills") { Instance.MaxSkills(); }
-                    else if (Instance.CurrentVote == "Unlock") { Instance.Unlock(); }
-                    else if (Instance.CurrentVote == "Kick") { Instance.Kick(); }
-                    else if (Instance.CurrentVote == "Mute") { Instance.Mute(); }
-                    else if (Instance.CurrentVote == "Spy") { Instance.Spy(); }
-                    else if (Instance.CurrentVote == "Custom") { /*Well, nothing*/ }
-                    else if (Instance.CurrentVote == "Rain") { CommandWindow.input.onInputText("Storm"); }
-                    else { CommandWindow.input.onInputText(Instance.CurrentVote); }
-                }
-                else if (VotesFor < Instance.Configuration.Instance.RequiredPercent) { UnturnedChat.Say(Instance.Translate("vote_failed"), Color.red); }
-
-                Instance.VoteInCooldown = true;
-                Instance.VoteInProgress = false;
-
-                InitiateVoteCooldown();
+                if (VotesFor >= Instance.Configuration.Instance.RequiredPercent) { Instance.FinishVote(); }
+                else if (VotesFor < Instance.Configuration.Instance.RequiredPercent) { UnturnedChat.Say(Instance.Translate("vote_failed"), Color.red); Instance.Cooldown(); }
 
             }).Start();
         }

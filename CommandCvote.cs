@@ -51,7 +51,7 @@ namespace Arechi.CallVote
 
             if (!VoteInProgress && !VoteInCooldown)
             {
-                if (CallVote.PlayerRequirement() == false) { UnturnedChat.Say(caller, CallVote.Instance.Translate("not_enough_players", CallVote.Instance.Configuration.Instance.MinimumPlayers), Color.red); return; }
+                if (CallVote.Instance.PlayerRequirement() == false) { UnturnedChat.Say(caller, CallVote.Instance.Translate("not_enough_players", CallVote.Instance.Configuration.Instance.MinimumPlayers), Color.red); return; }
                 for (int i = 0; i < CallVote.Instance.Configuration.Instance.Votes.Length; i++)
                 {
                     if (String.Compare(command[0], CallVote.Instance.Configuration.Instance.Votes[i].Name, true) == 0 || String.Compare(command[0], CallVote.Instance.Configuration.Instance.Votes[i].Alias, true) == 0)

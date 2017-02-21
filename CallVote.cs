@@ -23,28 +23,28 @@ namespace Arechi.CallVote
         public Color MessageColor;
         public List<CSteamID> Voters;
         public CSteamID PlayerToKickOrMute, PlayerToSpy;
-        public static Dictionary<CSteamID, DateTime> MutedPlayers;
+        public Dictionary<CSteamID, DateTime> MutedPlayers;
         public static CallVote Instance;
 
         protected override void Load()
         {
             Instance = this;
-            MessageColor = UnturnedChat.GetColorFromName(Instance.Configuration.Instance.Color, Color.yellow);
+            MessageColor = UnturnedChat.GetColorFromName(Configuration.Instance.Color, Color.yellow);
             VoteInProgress = false;
             VoteInCooldown = false;
             VoteFinished = false;
             Voters = new List<CSteamID>();
-            if (Instance.Configuration.Instance.Votes[10].Enabled) { MutedPlayers = new Dictionary<CSteamID, DateTime>(); ; Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerChatted += OnChatted; }
+            if (Configuration.Instance.Votes[10].Enabled) { MutedPlayers = new Dictionary<CSteamID, DateTime>(); ; Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerChatted += OnChatted; }
             Logger.LogWarning("================[CallVote]================");
-            Logger.Log("Timer: " + Instance.Configuration.Instance.VoteTimer + " seconds");
-            Logger.Log("Cooldown: " + Instance.Configuration.Instance.VoteCooldown + " seconds");
-            Logger.Log("Required Players: " + Instance.Configuration.Instance.MinimumPlayers);
-            Logger.Log("Required Percent: " + Instance.Configuration.Instance.RequiredPercent + "%");
-            if (Instance.Configuration.Instance.Votes[10].Enabled) { Logger.Log("Mute Time: " + Instance.Configuration.Instance.MuteTime + " minutes"); }
+            Logger.Log("Timer: " + Configuration.Instance.VoteTimer + " seconds");
+            Logger.Log("Cooldown: " + Configuration.Instance.VoteCooldown + " seconds");
+            Logger.Log("Required Players: " + Configuration.Instance.MinimumPlayers);
+            Logger.Log("Required Percent: " + Configuration.Instance.RequiredPercent + "%");
+            if (Configuration.Instance.Votes[10].Enabled) { Logger.Log("Mute Time: " + Configuration.Instance.MuteTime + " minutes"); }
             Logger.LogWarning("================[Features]================");
-            Logger.Log("Auto Vote For Caller", Instance.Configuration.Instance.AutoVoteCaller.Check());
-            Logger.Log("Finish Vote Before Timer", Instance.Configuration.Instance.FinishVoteEarly.Check());
-            Logger.Log("Notify When Cooldown Over", Instance.Configuration.Instance.NotifyCooldownOver.Check());  
+            Logger.Log("Auto Vote For Caller", Configuration.Instance.AutoVoteCaller.Check());
+            Logger.Log("Finish Vote Before Timer", Configuration.Instance.FinishVoteEarly.Check());
+            Logger.Log("Notify When Cooldown Over", Configuration.Instance.NotifyCooldownOver.Check());  
             Logger.LogWarning("=================[Votes?]=================");
             for (int i = 0; i < Configuration.Instance.Votes.Length; i++)
             {
@@ -57,7 +57,7 @@ namespace Arechi.CallVote
         {
             Voters.Clear();
             MutedPlayers.Clear();
-            if (Instance.Configuration.Instance.Votes[10].Enabled) { MutedPlayers.Clear(); Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerChatted -= OnChatted; }
+            if (Configuration.Instance.Votes[10].Enabled) { MutedPlayers.Clear(); Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerChatted -= OnChatted; }
             Logger.LogWarning("CallVote has been unloaded!");
         }
 
@@ -119,9 +119,9 @@ namespace Arechi.CallVote
             }
         }
 
-        public static bool PlayerRequirement()
+        public bool PlayerRequirement()
         {
-            if (Provider.clients.Count < Instance.Configuration.Instance.MinimumPlayers) { return false; }
+            if (Provider.clients.Count < Configuration.Instance.MinimumPlayers) { return false; }
             else return true;
         }
 
@@ -130,7 +130,7 @@ namespace Arechi.CallVote
             if (MutedPlayers.ContainsKey(player.CSteamID) && !message.StartsWith("/") && chatMode == EChatMode.GLOBAL)
             {
                 DateTime mute;
-                int time = Instance.Configuration.Instance.MuteTime;
+                int time = Configuration.Instance.MuteTime;
                 MutedPlayers.TryGetValue(player.CSteamID, out mute);
                 if ((DateTime.Now - mute).TotalMinutes >= time)
                 {
@@ -139,7 +139,7 @@ namespace Arechi.CallVote
                 else
                 {
                     cancel = true;
-                    UnturnedChat.Say(player, Instance.Translate("mute_reason", time), Color.green);
+                    UnturnedChat.Say(player, Translate("mute_reason", time), Color.green);
                 }  
             }
         }
@@ -154,13 +154,13 @@ namespace Arechi.CallVote
                     Votes.Add(Configuration.Instance.Votes[i].Name + "[" + Configuration.Instance.Votes[i].Alias + "]");
                 }
             }
-            UnturnedChat.Say(player, Instance.Translate("vote_help", String.Join(", ", Votes.ToArray())), Color.green);
+            UnturnedChat.Say(player, Translate("vote_help", String.Join(", ", Votes.ToArray())), Color.green);
         }
 
         public void Notify(UnturnedPlayer player, int type)
         {
-            if (type == 1) { UnturnedChat.Say(player, Instance.Translate("vote_disabled"), Color.red); }
-            if (type == 2) { UnturnedChat.Say(player, Instance.Translate("vote_no_permission"), Color.red); }
+            if (type == 1) { UnturnedChat.Say(player, Translate("vote_disabled"), Color.red); }
+            if (type == 2) { UnturnedChat.Say(player, Translate("vote_no_permission"), Color.red); }
         }
 
         public void Vote(IRocketPlayer player)
@@ -350,9 +350,9 @@ namespace Arechi.CallVote
 
         public void Cooldown()
         {
-            Instance.VoteInCooldown = true;
-            Instance.VoteInProgress = false;
-            Instance.VoteFinished = true;
+            VoteInCooldown = true;
+            VoteInProgress = false;
+            VoteFinished = true;
 
             InitiateVoteCooldown();
         }

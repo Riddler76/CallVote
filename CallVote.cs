@@ -167,29 +167,29 @@ namespace Arechi.CallVote
         {
             if (player is ConsolePlayer)
             {
-                UnturnedChat.Say(Instance.Translate("vote_ongoing", 0, Instance.Configuration.Instance.RequiredPercent), Instance.MessageColor);
+                UnturnedChat.Say(Translate("vote_ongoing", 0, Configuration.Instance.RequiredPercent), MessageColor);
                 return;
             }
-            if (!Instance.Voters.Contains(((UnturnedPlayer)player).CSteamID))
+            if (!Voters.Contains(((UnturnedPlayer)player).CSteamID))
             {
-                Instance.Voters.Add(((UnturnedPlayer)player).CSteamID);
+                Voters.Add(((UnturnedPlayer)player).CSteamID);
                 int VotesFor = (int)Math.Round((decimal)Instance.Voters.Count / Provider.clients.Count * 100);
-                UnturnedChat.Say(Instance.Translate("vote_ongoing", VotesFor, Instance.Configuration.Instance.RequiredPercent), Instance.MessageColor);
-                if (VotesFor >= Instance.Configuration.Instance.RequiredPercent && Instance.Configuration.Instance.FinishVoteEarly == true)
+                UnturnedChat.Say(Translate("vote_ongoing", VotesFor, Configuration.Instance.RequiredPercent), MessageColor);
+                if (VotesFor >= Configuration.Instance.RequiredPercent && Configuration.Instance.FinishVoteEarly == true)
                 {
-                    Instance.FinishVote();
+                    FinishVote();
                 }
             }
-            else if (Instance.Voters.Contains(((UnturnedPlayer)player).CSteamID))
+            else if (Voters.Contains(((UnturnedPlayer)player).CSteamID))
             {
-                UnturnedChat.Say(player, Instance.Translate("already_voted"), Instance.MessageColor);
+                UnturnedChat.Say(player, Translate("already_voted"), MessageColor);
             }
         }
 
         public void Mute()
         {
             MutedPlayers.Add(PlayerToKickOrMute, DateTime.Now);
-            UnturnedChat.Say(PlayerToKickOrMute, Instance.Translate("mute_message", Configuration.Instance.MuteTime), Color.green);
+            UnturnedChat.Say(PlayerToKickOrMute, Translate("mute_message", Configuration.Instance.MuteTime), Color.green);
         }
 
         public void AirdropAll()
@@ -210,7 +210,7 @@ namespace Arechi.CallVote
             {
                 int id = rand.Next(Airdropids.Count);
                 LevelManager.airdrop(p.player.transform.position, Airdropids[id]);
-                UnturnedChat.Say(p.playerID.steamID, Instance.Translate("airdropall_message", UnturnedPlayer.FromCSteamID(p.playerID.steamID).DisplayName), Color.green);
+                UnturnedChat.Say(p.playerID.steamID, Translate("airdropall_message", UnturnedPlayer.FromCSteamID(p.playerID.steamID).DisplayName), Color.green);
             }
         }
 
@@ -232,14 +232,14 @@ namespace Arechi.CallVote
         {
             System.Random rand = new System.Random();
             UnturnedPlayer player;
-
+        
             foreach (var p in Provider.clients)
             {
                 ushort vehicle = (ushort)rand.Next(1, 138);
                 player = UnturnedPlayer.FromCSteamID(p.playerID.steamID);
                 player.GiveVehicle(vehicle);
                 Asset a = Assets.find(EAssetType.VEHICLE, vehicle);
-                UnturnedChat.Say(p.playerID.steamID, Instance.Translate("vehicleall_message", ((VehicleAsset)a).vehicleName), MessageColor);
+                UnturnedChat.Say(p.playerID.steamID, Translate("vehicleall_message", ((VehicleAsset)a).vehicleName), MessageColor);
             }
         }
 
@@ -251,7 +251,7 @@ namespace Arechi.CallVote
             {
                 player = UnturnedPlayer.FromCSteamID(p.playerID.steamID);
                 player.GiveItem(ItemToGive, 1);
-                UnturnedChat.Say(p.playerID.steamID, Instance.Translate("itemall_message", UnturnedItems.GetItemAssetById(ItemToGive).itemName), MessageColor);
+                UnturnedChat.Say(p.playerID.steamID, Translate("itemall_message", UnturnedItems.GetItemAssetById(ItemToGive).itemName), MessageColor);
             }
         }
 
@@ -303,7 +303,7 @@ namespace Arechi.CallVote
 
         public void Kick()
         {
-            Provider.kick(PlayerToKickOrMute, Instance.Translate("kick_reason"));
+            Provider.kick(PlayerToKickOrMute, Translate("kick_reason"));
         }
 
         public void Spy()
@@ -314,14 +314,14 @@ namespace Arechi.CallVote
                 if (p.playerID.steamID != player.CSteamID)
                 {
                     player.Player.sendScreenshot(p.playerID.steamID);
-                    UnturnedChat.Say(UnturnedPlayer.FromCSteamID(p.playerID.steamID), Instance.Translate("check_ready", UnturnedPlayer.FromCSteamID(PlayerToSpy).DisplayName), MessageColor);
+                    UnturnedChat.Say(UnturnedPlayer.FromCSteamID(p.playerID.steamID), Translate("check_ready", UnturnedPlayer.FromCSteamID(PlayerToSpy).DisplayName), MessageColor);
                 }
             }
         }
 
         public void FinishVote()
         {
-            UnturnedChat.Say(Instance.Translate("vote_success"), MessageColor);
+            UnturnedChat.Say(Translate("vote_success"), MessageColor);
 
             try
             {
@@ -357,36 +357,35 @@ namespace Arechi.CallVote
             InitiateVoteCooldown();
         }
 
-        public static void StartVote(string kind)
+        public void StartVote()
         {
             new Thread(() =>
             {
-                Instance.CurrentVote = kind;
-                Instance.VoteInProgress = true;
+                VoteInProgress = true;
                 Thread.CurrentThread.IsBackground = true;
                 Thread.Sleep(Instance.Configuration.Instance.VoteTimer * 1000);
 
-                if (Instance.VoteFinished == true) return;
+                if (VoteFinished == true) return;
 
-                int VotesFor = (int)Math.Round((decimal)Instance.Voters.Count / Provider.clients.Count * 100);
+                int VotesFor = (int)Math.Round((decimal)Voters.Count / Provider.clients.Count * 100);
                    
-                if (VotesFor >= Instance.Configuration.Instance.RequiredPercent) { Instance.FinishVote(); }
-                else if (VotesFor < Instance.Configuration.Instance.RequiredPercent) { UnturnedChat.Say(Instance.Translate("vote_failed"), Color.red); Instance.Cooldown(); }
+                if (VotesFor >= Configuration.Instance.RequiredPercent) { FinishVote(); }
+                else if (VotesFor < Configuration.Instance.RequiredPercent) { UnturnedChat.Say(Translate("vote_failed"), Color.red); Cooldown(); }
 
             }).Start();
         }
 
-        public static void InitiateVoteCooldown()
+        public void InitiateVoteCooldown()
         {
             new Thread(() =>
             {
-                Instance.Voters.Clear();
                 Thread.CurrentThread.IsBackground = true;
-                Thread.Sleep(Instance.Configuration.Instance.VoteCooldown * 1000);
+                Thread.Sleep(Configuration.Instance.VoteCooldown * 1000);
 
-                if (Instance.Configuration.Instance.NotifyCooldownOver == true) { UnturnedChat.Say(Instance.Translate("cooldown_over"), Instance.MessageColor); }
-
-                Instance.VoteInCooldown = false;
+                Voters.Clear();
+                CurrentVote = String.Empty;
+                VoteInCooldown = false;
+                if (Configuration.Instance.NotifyCooldownOver == true) { UnturnedChat.Say(Translate("cooldown_over"), MessageColor); }
 
             }).Start();
         }

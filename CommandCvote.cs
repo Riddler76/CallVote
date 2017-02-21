@@ -102,7 +102,8 @@ namespace Arechi.CallVote
                             UnturnedChat.Say(CallVote.Instance.Translate("vote_started", caller.DisplayName, VoteTimer, CallVote.Instance.Translate(CallVote.Instance.Configuration.Instance.Votes[i].Name, Message)), CallVote.Instance.MessageColor);
                         }
 
-                        CallVote.StartVote(CallVote.Instance.Configuration.Instance.Votes[i].Name);
+                        CallVote.Instance.CurrentVote = CallVote.Instance.Configuration.Instance.Votes[i].Name;
+                        CallVote.Instance.StartVote();
                         if (CallVote.Instance.Configuration.Instance.AutoVoteCaller) { CallVote.Instance.Vote(caller); }
                     }
                 }

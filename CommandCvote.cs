@@ -103,7 +103,7 @@ namespace Arechi.CallVote
                         }
 
                         CallVote.Instance.CurrentVote = CallVote.Instance.Configuration.Instance.Votes[i].Name;
-                        CallVote.Instance.StartVote();
+                        CallVote.Instance.StartCoroutine(CallVote.Instance.Voting());
                         if (CallVote.Instance.Configuration.Instance.AutoVoteCaller) { CallVote.Instance.Vote(caller); }
                     }
                 }

@@ -20,8 +20,8 @@ namespace Arechi.CallVote
             FinishVoteEarly = true;
             NotifyCooldownOver = false;
             MinimumPlayers = 0;
-            VoteTimer = 50;
-            VoteCooldown = 50;
+            VoteTimer = 60;
+            VoteCooldown = 300;
             RequiredPercent = 60;
             MuteTime = 5;
 

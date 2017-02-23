@@ -8,8 +8,8 @@ using Rocket.Unturned.Skills;
 using SDG.Unturned;
 using Steamworks;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using Logger = Rocket.Core.Logging.Logger;
 
@@ -57,66 +57,100 @@ namespace Arechi.CallVote
         {
             Voters.Clear();
             MutedPlayers.Clear();
+            StopCoroutine(Voting());
             if (Configuration.Instance.Votes[10].Enabled) { MutedPlayers.Clear(); Rocket.Unturned.Events.UnturnedPlayerEvents.OnPlayerChatted -= OnChatted; }
             Logger.LogWarning("CallVote has been unloaded!");
         }
 
-        public override TranslationList DefaultTranslations
+        public IEnumerator Voting()
         {
-            get
+            VoteInProgress = true;
+            yield return new WaitForSeconds(Configuration.Instance.VoteTimer);
+
+            int VotesFor = (int)Math.Round((decimal)Voters.Count / Provider.clients.Count * 100);
+            if (VotesFor >= Configuration.Instance.RequiredPercent && !VoteFinished) { FinishVote(); }
+            else if (VotesFor < Configuration.Instance.RequiredPercent) { UnturnedChat.Say(Translate("vote_failed"), Color.red); }
+            VoteInCooldown = true;
+            VoteInProgress = false;
+            VoteFinished = true;
+            Voters.Clear();
+            CurrentVote = String.Empty;
+            yield return new WaitForSeconds(Configuration.Instance.VoteCooldown);
+
+            VoteInCooldown = false;
+            if (Configuration.Instance.NotifyCooldownOver == true) { UnturnedChat.Say(Translate("cooldown_over"), MessageColor); }
+            StopCoroutine(Voting());
+        }
+
+        public void FinishVote()
+        {
+            UnturnedChat.Say(Translate("vote_success"), MessageColor);
+
+            try
             {
-                return new TranslationList()
+                switch (CurrentVote)
                 {
-                    //Help
-                    { "", "==============================[Help]==============================" },
-                    { "vote_help", "The votes you can call are: {0}. You can start one with /cvote <vote name|alias>" },
-
-                    //Events
-                    { "", "=============================[Events]=============================" },
-                    { "vote_started", "{0} has called a {1} second vote to {2}." },
-                    { "vote_ongoing", "{0}% Yes. Required: {1}%. Type /cv to vote." },
-                    { "vote_success", "The vote was successful." },
-                    { "vote_failed", "The vote was unsuccessful." },
-
-                    //Rejections
-                    { "", "===========================[Rejections]===========================" },
-                    { "already_voted", "You have already voted!" },
-                    { "no_ongoing_votes", "There are no votes currently active." },
-                    { "not_enough_players", "At least {0} players are required to start a vote!" },
-                    { "vote_cooldown", "A vote may only be called every {0} seconds." },
-                    { "vote_disabled", "This type of vote is disabled on the server." },
-                    { "vote_no_permission", "This type of vote is not permitted for you." },
-                    { "vote_error", "Only one vote may be called at a time." },
-
-                    //Misc
-                    { "", "==============================[Misc]==============================" },
-                    { "kick_reason", "The majority decided so." },
-                    { "mute_reason", "The majority decided to mute you. Wait {0} minutes." },
-                    { "check_ready", "The spy screenshot is ready for {0}. Press ESC to check it out." },
-                    { "airdropall_message", "An airdrop is coming right to your spot, {0}!" },
-                    { "vehicleall_message", "You received a {0}!" },
-                    { "itemall_message", "You received a {0}!" },
-                    { "mute_message", "You have been muted for {0} minutes." },
-                    { "cooldown_over", "The vote cooldown is over. You can start another vote if desired." },
-
-                    //Vote types
-                    { "", "===========================[Vote types]===========================" },
-                    { "Day", "make it Day" },
-                    { "Night", "make it Night" },
-                    { "Rain", "start/stop Rain" },
-                    { "Airdrop", "summon an Airdrop" },
-                    { "AirdropAll", "summon an Airdrop for everyone" },
-                    { "HealAll", "Heal everyone" },
-                    { "VehicleAll", "give everyone a random Vehicle" },
-                    { "ItemAll", "give everyone a {0}" },
-                    { "MaxSkills", "Max everyone's skills" },
-                    { "Unlock", "Unlock every Vehicle" },
-                    { "Kick", "Kick {0}" },
-                    { "Mute", "Mute {0} for {1} minutes" },
-                    { "Spy", "Spy someone together" },
-                    { "Custom", "{0}" },
-                };
+                    case "AirdropAll": AirdropAll(); break;
+                    case "HealAll": HealAll(); break;
+                    case "VehicleAll": VehicleAll(); break;
+                    case "ItemAll": ItemAll(); break;
+                    case "MaxSkills": MaxSkills(); break;
+                    case "Unlock": Unlock(); break;
+                    case "Kick": Kick(); break;
+                    case "Mute": Mute(); break;
+                    case "Spy": Spy(); break;
+                    case "Custom": /*Nothing*/ break;
+                    case "Rain": CommandWindow.input.onInputText("Storm"); break;
+                    default: CommandWindow.input.onInputText(CurrentVote); break;
+                }
+                VoteFinished = true;
             }
+            catch (Exception ex)
+            {
+                Logger.LogException(ex);
+            }
+        }
+
+        public void Vote(IRocketPlayer player)
+        {
+            if (player is ConsolePlayer)
+            {
+                UnturnedChat.Say(Translate("vote_ongoing", 0, Configuration.Instance.RequiredPercent, CurrentVote), MessageColor);
+                return;
+            }
+            if (!Voters.Contains(((UnturnedPlayer)player).CSteamID))
+            {
+                Voters.Add(((UnturnedPlayer)player).CSteamID);
+                int VotesFor = (int)Math.Round((decimal)Instance.Voters.Count / Provider.clients.Count * 100);
+                UnturnedChat.Say(Translate("vote_ongoing", VotesFor, Configuration.Instance.RequiredPercent, CurrentVote), MessageColor);
+                if (VotesFor >= Configuration.Instance.RequiredPercent && Configuration.Instance.FinishVoteEarly == true)
+                {
+                    FinishVote();
+                }
+            }
+            else if (Voters.Contains(((UnturnedPlayer)player).CSteamID))
+            {
+                UnturnedChat.Say(player, Translate("already_voted"), MessageColor);
+            }
+        }
+
+        public void Help(UnturnedPlayer player)
+        {
+            List<string> Votes = new List<string>();
+            for (int i = 0; i < Configuration.Instance.Votes.Length; i++)
+            {
+                if (Configuration.Instance.Votes[i].Enabled && player.HasPermission("cvote." + Configuration.Instance.Votes[i].Name.ToLower()))
+                {
+                    Votes.Add(Configuration.Instance.Votes[i].Name + "[" + Configuration.Instance.Votes[i].Alias + "]");
+                }
+            }
+            UnturnedChat.Say(player, Translate("vote_help", String.Join(", ", Votes.ToArray())), Color.green);
+        }
+
+        public void Notify(UnturnedPlayer player, int type)
+        {
+            if (type == 1) { UnturnedChat.Say(player, Translate("vote_disabled"), Color.red); }
+            if (type == 2) { UnturnedChat.Say(player, Translate("vote_no_permission"), Color.red); }
         }
 
         public bool PlayerRequirement()
@@ -140,49 +174,7 @@ namespace Arechi.CallVote
                 {
                     cancel = true;
                     UnturnedChat.Say(player, Translate("mute_reason", time), Color.green);
-                }  
-            }
-        }
-
-        public void Help(UnturnedPlayer player)
-        {
-            List<string> Votes = new List<string>();
-            for (int i = 0; i < Configuration.Instance.Votes.Length; i++)
-            {
-                if (Configuration.Instance.Votes[i].Enabled && player.HasPermission("cvote." + Configuration.Instance.Votes[i].Name.ToLower()))
-                {
-                    Votes.Add(Configuration.Instance.Votes[i].Name + "[" + Configuration.Instance.Votes[i].Alias + "]");
                 }
-            }
-            UnturnedChat.Say(player, Translate("vote_help", String.Join(", ", Votes.ToArray())), Color.green);
-        }
-
-        public void Notify(UnturnedPlayer player, int type)
-        {
-            if (type == 1) { UnturnedChat.Say(player, Translate("vote_disabled"), Color.red); }
-            if (type == 2) { UnturnedChat.Say(player, Translate("vote_no_permission"), Color.red); }
-        }
-
-        public void Vote(IRocketPlayer player)
-        {
-            if (player is ConsolePlayer)
-            {
-                UnturnedChat.Say(Translate("vote_ongoing", 0, Configuration.Instance.RequiredPercent), MessageColor);
-                return;
-            }
-            if (!Voters.Contains(((UnturnedPlayer)player).CSteamID))
-            {
-                Voters.Add(((UnturnedPlayer)player).CSteamID);
-                int VotesFor = (int)Math.Round((decimal)Instance.Voters.Count / Provider.clients.Count * 100);
-                UnturnedChat.Say(Translate("vote_ongoing", VotesFor, Configuration.Instance.RequiredPercent), MessageColor);
-                if (VotesFor >= Configuration.Instance.RequiredPercent && Configuration.Instance.FinishVoteEarly == true)
-                {
-                    FinishVote();
-                }
-            }
-            else if (Voters.Contains(((UnturnedPlayer)player).CSteamID))
-            {
-                UnturnedChat.Say(player, Translate("already_voted"), MessageColor);
             }
         }
 
@@ -232,7 +224,7 @@ namespace Arechi.CallVote
         {
             System.Random rand = new System.Random();
             UnturnedPlayer player;
-        
+
             foreach (var p in Provider.clients)
             {
                 ushort vehicle = (ushort)rand.Next(1, 138);
@@ -319,75 +311,62 @@ namespace Arechi.CallVote
             }
         }
 
-        public void FinishVote()
+        public override TranslationList DefaultTranslations
         {
-            UnturnedChat.Say(Translate("vote_success"), MessageColor);
-
-            try
+            get
             {
-                switch (CurrentVote)
+                return new TranslationList()
                 {
-                    case "AirdropAll": AirdropAll(); break;
-                    case "HealAll": HealAll(); break;
-                    case "VehicleAll": VehicleAll(); break;
-                    case "ItemAll": ItemAll(); break;
-                    case "MaxSkills": MaxSkills(); break;
-                    case "Unlock": Unlock(); break;
-                    case "Kick": Kick(); break;
-                    case "Mute": Mute(); break;
-                    case "Spy": Spy(); break;
-                    case "Custom": /*Nothing*/ break;
-                    case "Rain": CommandWindow.input.onInputText("Storm"); break;
-                    default: CommandWindow.input.onInputText(CurrentVote); break;
-                }
-                Cooldown();
+                    //Help
+                    { "", "==============================[Help]==============================" },
+                    { "vote_help", "The votes you can call are: {0}. You can start one with /cvote <vote name|alias>" },
+
+                    //Events
+                    { "", "=============================[Events]=============================" },
+                    { "vote_started", "{0} has called a {1} second vote to {2}." },
+                    { "vote_ongoing", "[{2} Vote]: {0}%. Required: {1}%. Type /cv to vote." },
+                    { "vote_success", "The vote was successful." },
+                    { "vote_failed", "The vote was unsuccessful." },
+
+                    //Rejections
+                    { "", "===========================[Rejections]===========================" },
+                    { "already_voted", "You have already voted!" },
+                    { "no_ongoing_votes", "There are no votes currently active." },
+                    { "not_enough_players", "At least {0} players are required to start a vote!" },
+                    { "vote_cooldown", "A vote may only be called every {0} seconds." },
+                    { "vote_disabled", "This type of vote is disabled on the server." },
+                    { "vote_no_permission", "This type of vote is not permitted for you." },
+                    { "vote_error", "Only one vote may be called at a time." },
+
+                    //Misc
+                    { "", "==============================[Misc]==============================" },
+                    { "kick_reason", "The majority decided so." },
+                    { "mute_reason", "The majority decided to mute you. Wait {0} minutes." },
+                    { "check_ready", "The spy screenshot is ready for {0}. Press ESC to check it out." },
+                    { "airdropall_message", "An airdrop is coming right to your spot, {0}!" },
+                    { "vehicleall_message", "You received a {0}!" },
+                    { "itemall_message", "You received a {0}!" },
+                    { "mute_message", "You have been muted for {0} minutes." },
+                    { "cooldown_over", "The vote cooldown is over. You can start another vote if desired." },
+
+                    //Vote types
+                    { "", "===========================[Vote types]===========================" },
+                    { "Day", "make it Day" },
+                    { "Night", "make it Night" },
+                    { "Rain", "start/stop Rain" },
+                    { "Airdrop", "summon an Airdrop" },
+                    { "AirdropAll", "summon an Airdrop for everyone" },
+                    { "HealAll", "Heal everyone" },
+                    { "VehicleAll", "give everyone a random Vehicle" },
+                    { "ItemAll", "give everyone a {0}" },
+                    { "MaxSkills", "Max everyone's skills" },
+                    { "Unlock", "Unlock every Vehicle" },
+                    { "Kick", "Kick {0}" },
+                    { "Mute", "Mute {0} for {1} minutes" },
+                    { "Spy", "Spy someone together" },
+                    { "Custom", "{0}" },
+                };
             }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-        }
-
-        public void Cooldown()
-        {
-            VoteInCooldown = true;
-            VoteInProgress = false;
-            VoteFinished = true;
-
-            InitiateVoteCooldown();
-        }
-
-        public void StartVote()
-        {
-            new Thread(() =>
-            {
-                VoteInProgress = true;
-                Thread.CurrentThread.IsBackground = true;
-                Thread.Sleep(Instance.Configuration.Instance.VoteTimer * 1000);
-
-                if (VoteFinished == true) return;
-
-                int VotesFor = (int)Math.Round((decimal)Voters.Count / Provider.clients.Count * 100);
-                   
-                if (VotesFor >= Configuration.Instance.RequiredPercent) { FinishVote(); }
-                else if (VotesFor < Configuration.Instance.RequiredPercent) { UnturnedChat.Say(Translate("vote_failed"), Color.red); Cooldown(); }
-
-            }).Start();
-        }
-
-        public void InitiateVoteCooldown()
-        {
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-                Thread.Sleep(Configuration.Instance.VoteCooldown * 1000);
-
-                Voters.Clear();
-                CurrentVote = String.Empty;
-                VoteInCooldown = false;
-                if (Configuration.Instance.NotifyCooldownOver == true) { UnturnedChat.Say(Translate("cooldown_over"), MessageColor); }
-
-            }).Start();
         }
     }
 

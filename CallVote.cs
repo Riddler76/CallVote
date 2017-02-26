@@ -26,6 +26,13 @@ namespace Arechi.CallVote
         public Dictionary<CSteamID, DateTime> MutedPlayers;
         public static CallVote Instance;
 
+        public delegate void VoteStart(IRocketPlayer player, string vote);
+        public event VoteStart OnVoteStart;
+        public delegate void PlayerVote(UnturnedPlayer player, string vote, int percent);
+        public event PlayerVote OnPlayerVote;
+        public delegate void VoteResult(string vote, int percent, string result);
+        public event VoteResult OnVoteResult;
+
         protected override void Load()
         {
             Instance = this;
@@ -62,14 +69,32 @@ namespace Arechi.CallVote
             Logger.LogWarning("CallVote has been unloaded!");
         }
 
+        internal void VoteStarted(IRocketPlayer player, string vote)
+        {
+            if (OnVoteStart != null)
+                OnVoteStart(player, vote);
+        }
+
+        internal void PlayerVoted(UnturnedPlayer player, string vote, int percent)
+        {
+            if (OnPlayerVote != null)
+                OnPlayerVote(player, vote, percent);
+        }
+
+        internal void VoteConcluded(string vote, int percent, string result)
+        {
+            if (OnVoteResult != null)
+                OnVoteResult(vote, percent, result);
+        }
+
         public IEnumerator Voting()
         {
             VoteInProgress = true;
             yield return new WaitForSeconds(Configuration.Instance.VoteTimer);
 
             int VotesFor = (int)Math.Round((decimal)Voters.Count / Provider.clients.Count * 100);
-            if (VotesFor >= Configuration.Instance.RequiredPercent && !VoteFinished) { FinishVote(); }
-            else if (VotesFor < Configuration.Instance.RequiredPercent) { UnturnedChat.Say(Translate("vote_failed"), Color.red); }
+            if (VotesFor >= Configuration.Instance.RequiredPercent && !VoteFinished) { FinishVote(); VoteConcluded(CurrentVote, VotesFor, "Succeeded"); }
+            else if (VotesFor < Configuration.Instance.RequiredPercent) { UnturnedChat.Say(Translate("vote_failed"), Color.red); VoteConcluded(CurrentVote, VotesFor, "Failed"); }
             VoteInCooldown = true;
             VoteInProgress = false;
             VoteFinished = true;
@@ -123,9 +148,11 @@ namespace Arechi.CallVote
                 Voters.Add(((UnturnedPlayer)player).CSteamID);
                 int VotesFor = (int)Math.Round((decimal)Instance.Voters.Count / Provider.clients.Count * 100);
                 UnturnedChat.Say(Translate("vote_ongoing", VotesFor, Configuration.Instance.RequiredPercent, CurrentVote), MessageColor);
+                PlayerVoted((UnturnedPlayer)player, CurrentVote, VotesFor);
                 if (VotesFor >= Configuration.Instance.RequiredPercent && Configuration.Instance.FinishVoteEarly == true)
                 {
                     FinishVote();
+                    VoteConcluded(CurrentVote, VotesFor, "Succeeded");
                 }
             }
             else if (Voters.Contains(((UnturnedPlayer)player).CSteamID))

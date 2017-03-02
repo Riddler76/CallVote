@@ -4,7 +4,6 @@ using Rocket.Core.Plugins;
 using Rocket.Unturned.Chat;
 using Rocket.Unturned.Items;
 using Rocket.Unturned.Player;
-using Rocket.Unturned.Skills;
 using SDG.Unturned;
 using Steamworks;
 using System;
@@ -278,33 +277,7 @@ namespace Arechi.CallVote
         {
             UnturnedPlayer player;
 
-            foreach (var p in Provider.clients)
-            {
-                player = UnturnedPlayer.FromCSteamID(p.playerID.steamID);
-
-                player.SetSkillLevel(UnturnedSkill.Agriculture, 255);
-                player.SetSkillLevel(UnturnedSkill.Cooking, 255);
-                player.SetSkillLevel(UnturnedSkill.Crafting, 255);
-                player.SetSkillLevel(UnturnedSkill.Dexerity, 255);
-                player.SetSkillLevel(UnturnedSkill.Diving, 255);
-                player.SetSkillLevel(UnturnedSkill.Fishing, 255);
-                player.SetSkillLevel(UnturnedSkill.Healing, 255);
-                player.SetSkillLevel(UnturnedSkill.Immunity, 255);
-                player.SetSkillLevel(UnturnedSkill.Mechanic, 255);
-                player.SetSkillLevel(UnturnedSkill.Outdoors, 255);
-                player.SetSkillLevel(UnturnedSkill.Overkill, 255);
-                player.SetSkillLevel(UnturnedSkill.Parkour, 255);
-                player.SetSkillLevel(UnturnedSkill.Sharpshooter, 255);
-                player.SetSkillLevel(UnturnedSkill.Sneakybeaky, 255);
-                player.SetSkillLevel(UnturnedSkill.Strength, 255);
-                player.SetSkillLevel(UnturnedSkill.Survival, 255);
-                player.SetSkillLevel(UnturnedSkill.Toughness, 255);
-                player.SetSkillLevel(UnturnedSkill.Vitality, 255);
-                player.SetSkillLevel(UnturnedSkill.Warmblooded, 255);
-                player.SetSkillLevel(UnturnedSkill.Engineer, 255);
-                player.SetSkillLevel(UnturnedSkill.Exercise, 255);
-                player.SetSkillLevel(UnturnedSkill.Cardio, 255);
-            }
+            foreach (var p in Provider.clients) { player = UnturnedPlayer.FromCSteamID(p.playerID.steamID); player.MaxSkills(); }
         }
 
         public void Unlock()
@@ -314,7 +287,6 @@ namespace Arechi.CallVote
                 while (enumerator.MoveNext())
                 {
                     InteractableVehicle vehicle = enumerator.Current;
-
                     if (vehicle != null) { VehicleManager.unlockVehicle(vehicle); }
                 }
             }

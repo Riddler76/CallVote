@@ -3,14 +3,13 @@ using System.Xml.Serialization;
 
 namespace Arechi.CallVote
 {
-    public class CallVoteConfig : IRocketPluginConfiguration
+    public class Config : IRocketPluginConfiguration
     {
         public string Color;
         public bool FinishVoteEarly, NotifyCooldownOver, AutoVoteCaller;
         public int VoteTimer, VoteCooldown, RequiredPercent, MuteTime, MinimumPlayers;
 
-        [XmlArrayItem("Vote")]
-        [XmlArray(ElementName = "Votes")]
+        [XmlArray(ElementName = "Votes"), XmlArrayItem(ElementName = "Vote")]
         public Vote[] Votes;
 
         public void LoadDefaults()
@@ -42,32 +41,6 @@ namespace Arechi.CallVote
                 new Vote("Custom", "c", true),
                 new Vote("MaxSkills", "ms", true)
             };
-        }
-    }
-
-    public sealed class Vote
-    {
-        [XmlAttribute("Name")]
-        public string Name;
-
-        [XmlAttribute("Alias")]
-        public string Alias;
-
-        [XmlAttribute("Enabled")]
-        public bool Enabled;
-
-        public Vote(string name, string alias, bool enabled)
-        {
-            Name = name;
-            Alias = alias;
-            Enabled = enabled;
-        }
-
-        public Vote()
-        {
-            Name = "";
-            Alias = "";
-            Enabled = true;
         }
     }
 }
